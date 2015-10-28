@@ -4,6 +4,12 @@ namespace App\Http\Controllers;
 
 class ArticleController extends CommonController
 {
+
+    public function __construct()
+    {
+        $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
+    }
+
     public function index()
     {
         $articles = $this->article()
@@ -21,6 +27,10 @@ class ArticleController extends CommonController
 
     public function report()
     {
-        // todo
+        return $this->dbRepository('sqlsrv', 'lanmu')
+            ->select('lanmu_id as id', 'lanmu_name as name')
+            ->where('lanmu_language', 'zh-cn')
+            ->whereIn('lanmu_father', [113, 167, 168])
+            ->get();
     }
 }
