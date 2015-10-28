@@ -14,3 +14,9 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::group(array('prefix' => 'v5'), function()
+{
+    Route::get('articles', 'ArticleController@index');
+    Route::get('reports', 'ArticleController@report');
+});

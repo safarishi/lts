@@ -4,3 +4,5 @@ Homestead.yaml
 Homestead.json
 .env
 /database/migrations
+composer.lock
+/config/database.php
