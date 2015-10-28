@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\Api\ValidationException;
+
 class ArticleController extends CommonController
 {
 
@@ -25,6 +27,22 @@ class ArticleController extends CommonController
         return $articles;
     }
 
+    public function show($id)
+    {
+        $article = $this->article()
+            ->addSelect('article_body as content')
+            ->where('article_id', $id)
+            ->first();
+
+        if ($article === null) {
+            throw new ValidationException('文章 id 参数错误');
+        }
+
+        // $article->thumbnail_url = $this->addImagePrefixUrl($article->thumbnail_url);
+
+        var_dump($article); // object stdClass null
+    }
+
     public function report()
     {
         return $this->dbRepository('sqlsrv', 'lanmu')
@@ -33,4 +51,5 @@ class ArticleController extends CommonController
             ->whereIn('lanmu_father', [113, 167, 168])
             ->get();
     }
+
 }
