@@ -12,16 +12,15 @@
 */
 
 Route::get('/', function () {
+
     return view('welcome');
 });
 
-Route::patterns([
-    'id' => '[1-9][0-9]*',
-]);
+$api = app('Dingo\Api\Routing\Router');
 
-Route::group(array('prefix' => 'v5'), function()
+$api->version('v1', function($api)
 {
-    Route::get('articles', 'ArticleController@index');
-    Route::get('articles/{id}', 'ArticleController@show');
-    Route::get('reports', 'ArticleController@report');
+    $api->get('articles', 'App\Http\Controllers\ArticleController@index');
+    $api->get('articles/{id}', 'App\Http\Controllers\ArticleController@show');
+    $api->get('reports', 'App\Http\Controllers\ArticleController@report');
 });
