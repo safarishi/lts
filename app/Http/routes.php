@@ -23,4 +23,5 @@ $api->version('v1', function($api)
     $api->get('articles', 'App\Http\Controllers\ArticleController@index');
     $api->get('articles/{id}', 'App\Http\Controllers\ArticleController@show');
     $api->get('reports', 'App\Http\Controllers\ArticleController@report');
+    $api->put('articles/{id}/stars', 'App\Http\Controllers\ArticleController@star');
 });

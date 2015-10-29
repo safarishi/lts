@@ -166,4 +166,8 @@ class ArticleController extends CommonController
             ->get();
     }
 
+    public function star($id)
+    {
+        // todo
+    }
 }
