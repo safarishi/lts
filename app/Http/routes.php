@@ -24,4 +24,8 @@ $api->version('v1', function($api)
     $api->get('articles/{id}', 'App\Http\Controllers\ArticleController@show');
     $api->get('reports', 'App\Http\Controllers\ArticleController@report');
     $api->put('articles/{id}/stars', 'App\Http\Controllers\ArticleController@star');
+    $api->post('oauth/access_token', function()
+    {
+        return Response::json(Authorizer::issueAccessToken());
+    });
 });
