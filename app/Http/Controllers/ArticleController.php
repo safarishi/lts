@@ -14,8 +14,122 @@ class ArticleController extends CommonController
 
     public function index()
     {
-        $articles = $this->article()
+        $pictureNews = $this->article()
             ->where('article_havelogo', 1)
+            ->orderBy('article_addtime', 'desc')
+            ->take(3)
+            ->get();
+
+        foreach ($pictureNews as $value) {
+            $value->thumbnail_url = $this->addImagePrefixUrl($value->thumbnail_url);
+        }
+
+        $columns = $this->getColumns();
+
+        foreach ($columns as $column) {
+            // 获取栏目下的文章列表
+            $column->articles = $this->getColumnArticle($column->column_id);
+        }
+
+        return ['picture_news' => $pictureNews, 'article_list' => $columns];
+    }
+
+    protected function getColumns()
+    {
+        $columns = $this->column()
+            ->whereIn('lanmu_father', [1, 2, 52])
+            ->whereNotIn('lanmu_id', [2, 32, 52, 66])
+            ->get();
+
+        return $this->processColumnsData($columns);
+    }
+
+    protected function processColumnsData($columns)
+    {
+        $columns = $this->addSortField($columns);
+
+        $sort = array();
+        foreach ($columns as $column) {
+            $sort[] = $column->sort_value;
+        }
+
+        array_multisort($sort, SORT_ASC, $columns);
+
+        foreach ($columns as $column) {
+            unset($column->sort_value);
+        }
+
+        return $columns;
+    }
+
+    protected function addSortField($data)
+    {
+        foreach ($data as $value) {
+            if ($value->column_id === '6') {
+                $value->sort_value = 1;
+            } elseif ($value->column_id === '3') {
+                $value->sort_value = 3;
+            } elseif ($value->column_id === '7') {
+                $value->sort_value = 19;
+            } elseif ($value->column_id === '38') {
+                $value->sort_value = 15;
+            } elseif (in_array($value->column_id, [13, 71, 90, 168, 40, 167, 113, 171])) {
+                $value->sort_value = 5;
+            } else {
+                $value->sort_value = 17;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * [getColumnArticle description]
+     * @param  string $columnId [description]
+     * @return [type]           [description]
+     */
+    protected function getColumnArticle($columnId)
+    {
+        $articles = $this->getArticlesByColumnId($columnId);
+
+        if (count($articles) === 0) {
+            $articles = $this->getArticlesBySubColumnId($columnId);
+        }
+
+        return $articles;
+    }
+
+    protected function getArticlesByColumnId($id)
+    {
+        $articles = $this->article()->where('article_lanmu', $id)
+            ->orderBy('article_addtime', 'desc')
+            ->take(3)
+            ->get();
+
+        foreach ($articles as $value) {
+            $value->thumbnail_url = $this->addImagePrefixUrl($value->thumbnail_url);
+        }
+
+        return $articles;
+    }
+
+    /**
+     * [getArticlesBySubColumnId description]
+     * @param  string $id [description]
+     * @return [type]     [description]
+     */
+    protected function getArticlesBySubColumnId($id)
+    {
+        $columns = $this->column()
+            ->where('lanmu_father', $id)
+            ->get();
+
+        $ids = array();
+        foreach ($columns as $column) {
+            $ids[] = $column->column_id;
+        }
+
+        $articles = $this->article()->whereIn('article_lanmu', $ids)
             ->orderBy('article_addtime', 'desc')
             ->take(3)
             ->get();

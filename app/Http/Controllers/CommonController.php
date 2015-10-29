@@ -10,7 +10,7 @@ class CommonController extends Controller
      * [dbRepository description]
      *
      * @param  string $connection 数据库连接名
-     * @param  string $name       数据库仓库名（表或集合名）
+     * @param  string $name       数据库表名
      * @return object
      */
     protected function dbRepository($connection, $name)
@@ -38,5 +38,18 @@ class CommonController extends Controller
         }
 
         return '';
+    }
+
+    /**
+     * 栏目信息固定返回
+     *
+     * @return object
+     */
+    protected function column()
+    {
+        return $this->dbRepository('sqlsrv', 'lanmu')
+            ->select('lanmu_id as column_id', 'lanmu_name as column_name')
+            ->where('lanmu_language', 'zh-cn')
+            ->where('lanmu_active', 1);
     }
 }
