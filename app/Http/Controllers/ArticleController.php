@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\Api\ValidationException;
+use App\Exceptions\ValidationException;
 
 class ArticleController extends CommonController
 {
@@ -35,12 +35,12 @@ class ArticleController extends CommonController
             ->first();
 
         if ($article === null) {
-            throw new ValidationException('文章 id 参数错误');
+            throw new ValidationException('Article id parameter is wrong.');
         }
 
-        // $article->thumbnail_url = $this->addImagePrefixUrl($article->thumbnail_url);
+        $article->thumbnail_url = $this->addImagePrefixUrl($article->thumbnail_url);
 
-        var_dump($article); // object stdClass null
+        return (array) $article;
     }
 
     public function report()
