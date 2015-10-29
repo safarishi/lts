@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use App\Exceptions\ValidationException;
+use LucaDegasperi\OAuth2Server\Authorizer;
 
-class ArticleController extends CommonController
+class ArticleController extends ApiController
 {
 
     protected $origin;
 
-    public function __construct()
+    public function __construct(Authorizer $authorizer)
     {
+        parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
         $this->middleware('oauth', ['only' => ['star']]);
     }
@@ -201,6 +204,7 @@ class ArticleController extends CommonController
 
     public function star($id)
     {
+        $uid = $this->authorizer->getResourceOwnerId();
         // todo
     }
 

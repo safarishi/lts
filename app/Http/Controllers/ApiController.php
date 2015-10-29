@@ -17,7 +17,7 @@ class ApiController extends Controller
         try {
             $this->accessToken = $authorizer->getChecker()->determineAccessToken();
             if ($this->accessToken) {
-                $this->beforeFilter('oauth');
+                $this->middleware('oauth');
             }
         } catch (InvalidRequestException $e) {
             // do nothing
