@@ -7,9 +7,12 @@ use App\Exceptions\ValidationException;
 class ArticleController extends CommonController
 {
 
+    protected $origin;
+
     public function __construct()
     {
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
+        $this->middleware('oauth', ['only' => ['star']]);
     }
 
     public function index()
@@ -151,10 +154,40 @@ class ArticleController extends CommonController
         if ($article === null) {
             throw new ValidationException('Article id parameter is wrong.');
         }
+        // 处理文章内容里面的图片显示
+        $tmpContent = str_replace('&#34;', '"', $article->content);
+        $article->content = preg_replace('#(src=")/#', "\$1".'http://sisi-smu.org/', $tmpContent);
 
         $article->thumbnail_url = $this->addImagePrefixUrl($article->thumbnail_url);
+        // 返回是否收藏文章
+        // $article->is_starred = $this->checkUserArticleStar($id);
+        // todo
 
-        return (array) $article;
+        // 相关文章
+        $this->origin = $article->origin;
+        $relatedArticles = $this->getRelatedArticles($id);
+        // 热门评论
+        // $hotComments = $this->getHotComments($id);
+        // todo
+
+        return [
+            'article' => $article,
+            'related_articles' => $relatedArticles,
+        ];
+    }
+
+    /**
+     * [getRelatedArticles description]
+     * @param  string $id [article id]
+     * @return [type]     [description]
+     */
+    protected function getRelatedArticles($id)
+    {
+        return $this->article()
+            ->where('article_writer', $this->origin)
+            ->where('article_id', '<>', $id)
+            ->take(2)
+            ->get();
     }
 
     public function report()
@@ -170,4 +203,5 @@ class ArticleController extends CommonController
     {
         // todo
     }
+
 }
