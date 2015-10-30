@@ -8,6 +8,9 @@ class ValidationException extends HttpException
 {
     public function __construct($msg)
     {
+        if (is_array($msg)) {
+            $msg = implode($msg, ' ');
+        }
         parent::__construct(400, $msg);
     }
 }
