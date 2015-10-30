@@ -11,7 +11,8 @@ class ApiController extends Controller
 
     protected $accessToken;
 
-    public function __construct(Authorizer $authorizer = null){
+    public function __construct(Authorizer $authorizer = null)
+    {
         $this->authorizer = $authorizer;
 
         try {
@@ -25,7 +26,7 @@ class ApiController extends Controller
 
     }
 
-    public function index() {
-      return Input::all();
-    }
+    // public function index() {
+    //   return Input::all();
+    // }
 }
