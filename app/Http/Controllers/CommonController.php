@@ -55,4 +55,25 @@ class CommonController extends ApiController
             ->where('lanmu_language', 'zh-cn')
             ->where('lanmu_active', 1);
     }
+
+    /**
+     * 获取用户id
+     * 用户未登录返回空字符串 ''
+     * 登录用户返回用户id
+     *
+     * @return string
+     */
+    protected function getUid()
+    {
+        $uid = '';
+
+        if ($this->accessToken) {
+            // 获取用户id
+            $this->authorizer->validateAccessToken();
+            $uid = $this->authorizer->getResourceOwnerId();
+        }
+
+        return $uid;
+    }
+
 }
