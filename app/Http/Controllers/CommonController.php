@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Input;
+use Validator;
+use App\Exceptions\ValidationException;
 
 class CommonController extends ApiController
 {
@@ -101,6 +104,18 @@ class CommonController extends ApiController
         }
 
         return in_array($articleId, $starred);
+    }
+
+    // 校验内容必填 todo
+    protected function contentRequired()
+    {
+        // validator
+        $validator = Validator::make(Input::all(), [
+            'content' => 'required',
+        ]);
+        if ($validator->fails()) {
+            throw new ValidationException($validator->messages()->all());
+        }
     }
 
 }

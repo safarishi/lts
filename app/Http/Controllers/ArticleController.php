@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use DB;
 use Input;
 use Response;
-use Validator;
-use Illuminate\Http\Request;
 use App\Exceptions\ValidationException;
 use LucaDegasperi\OAuth2Server\Authorizer;
 use App\Exceptions\DuplicateOperationException;
@@ -21,6 +19,7 @@ class ArticleController extends CommonController
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
         $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply']]);
+        $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
 
     public function index()
@@ -254,16 +253,8 @@ class ArticleController extends CommonController
      * @param  string $id 文章id
      * @return [type]     [description]
      */
-    public function comment($id, Request $request)
+    public function comment($id)
     {
-        // validator
-        $validator = Validator::make($request->all(), [
-            'content' => 'required',
-        ]);
-        if ($validator->fails()) {
-            throw new ValidationException($validator->messages()->all());
-        }
-
         $uid = $this->authorizer->getResourceOwnerId();
 
         $this->user = $this->dbRepository('mongodb', 'user')
@@ -305,18 +296,10 @@ class ArticleController extends CommonController
      * @param  string $id 文章id
      * @return [type]     [description]
      */
-    public function anonymousComment($id, Request $request)
+    public function anonymousComment($id)
     {
-        throw new ValidationException('验证码填写错误');
+        // throw new ValidationException('验证码填写错误');
         // captcha todo
-
-        // validator
-        $validator = Validator::make($request->all(), [
-            'content' => 'required',
-        ]);
-        if ($validator->fails()) {
-            throw new ValidationException($validator->messages()->all());
-        }
 
         $this->user = MultiplexController::anonymousUser($request->ip());
 
@@ -328,19 +311,10 @@ class ArticleController extends CommonController
      *
      * @param  string  $id        文章id
      * @param  string  $commentId 文章评论id
-     * @param  Request $request   [description]
      * @return array
      */
-    public function reply($id, $commentId, Request $request)
+    public function reply($id, $commentId)
     {
-        // validator
-        $validator = Validator::make($request->all(), [
-            'content' => 'required',
-        ]);
-        if ($validator->fails()) {
-            throw new ValidationException($validator->messages()->all());
-        }
-
         $uid = $this->authorizer->getResourceOwnerId();
 
         $this->user = $this->dbRepository('mongodb', 'user')
@@ -375,21 +349,11 @@ class ArticleController extends CommonController
      * 文章评论匿名回复
      * @param  string  $id        文章id
      * @param  string  $commentId 文章评论id
-     * @param  Request $request   [description]
      * @return todo
      */
-    public function anonymousReply($id, $commentId, Request $request)
+    public function anonymousReply($id, $commentId)
     {
-        // throw new ValidationException('验证码填写错误');
-        // captcha todo
-
-        // validator
-        $validator = Validator::make($request->all(), [
-            'content' => 'required',
-        ]);
-        if ($validator->fails()) {
-            throw new ValidationException($validator->messages()->all());
-        }
+        echo 'todo';
     }
 
 }

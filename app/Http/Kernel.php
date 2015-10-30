@@ -37,5 +37,6 @@ class Kernel extends HttpKernel
         'csrf' => \App\Http\Middleware\VerifyCsrfToken::class,
         'disconnect' => \App\Http\Middleware\DatabaseDisconnection::class,
         'oauth.checkClient' => \App\Http\Middleware\OauthCheckClient::class,
+        'validation.required' => \App\Http\Middleware\FieldRequiredMiddleware::class,
     ];
 }
