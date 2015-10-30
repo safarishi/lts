@@ -6,6 +6,9 @@ use DB;
 
 class CommonController extends ApiController
 {
+
+    protected $models = array();
+
     /**
      * [dbRepository description]
      *
