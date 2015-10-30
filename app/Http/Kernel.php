@@ -36,5 +36,6 @@ class Kernel extends HttpKernel
         'check-authorization-params' => \LucaDegasperi\OAuth2Server\Middleware\CheckAuthCodeRequestMiddleware::class,
         'csrf' => \App\Http\Middleware\VerifyCsrfToken::class,
         'disconnect' => \App\Http\Middleware\DatabaseDisconnection::class,
+        'oauth.checkClient' => \App\Http\Middleware\OauthCheckClient::class,
     ];
 }
