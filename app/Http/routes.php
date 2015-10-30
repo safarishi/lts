@@ -26,6 +26,7 @@ $api->version('v1', function($api)
     $api->put('articles/{id}/stars', 'App\Http\Controllers\ArticleController@star');
     $api->delete('articles/{id}/stars', 'App\Http\Controllers\ArticleController@unstar');
     $api->post('articles/{id}/comments', 'App\Http\Controllers\ArticleController@comment');
+    $api->post('articles/{id}/anonymous_comments', 'App\Http\Controllers\ArticleController@anonymousComment');
     $api->post('oauth/access_token', 'App\Http\Controllers\OauthController@postAccessToken');
     $api->post('users', 'App\Http\Controllers\UserController@store');
 });

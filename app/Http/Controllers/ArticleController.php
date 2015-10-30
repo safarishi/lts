@@ -20,7 +20,7 @@ class ArticleController extends CommonController
     {
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
-        $this->middleware('oauth', ['except' => ['index', 'show', 'report']]);
+        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment']]);
     }
 
     public function index()
@@ -288,6 +288,30 @@ class ArticleController extends CommonController
         $insertId = $comment->insertGetId($insertData);
 
         return $comment->find($insertId);
+    }
+
+    /**
+     * 匿名评论文章
+     *
+     * @param  string $id 文章id
+     * @return [type]     [description]
+     */
+    public function anonymousComment($id, Request $request)
+    {
+        throw new ValidationException('验证码填写错误');
+        // captcha todo
+
+        // validator
+        $validator = Validator::make($request->all(), [
+            'content' => 'required',
+        ]);
+        if ($validator->fails()) {
+            throw new ValidationException($validator->messages()->all());
+        }
+
+        $this->user = MultiplexController::anonymousUser($request->ip());
+
+        return $this->commentResponse($id);
     }
 
 }
