@@ -17,7 +17,7 @@ class ArticleController extends CommonController
     {
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
-        $this->middleware('oauth', ['only' => ['star', 'unstar']]);
+        $this->middleware('oauth', ['except' => ['index', 'show', 'report']]);
     }
 
     public function index()
@@ -165,7 +165,7 @@ class ArticleController extends CommonController
 
         $article->thumbnail_url = $this->addImagePrefixUrl($article->thumbnail_url);
         // 返回是否收藏文章
-        // $article->is_starred = $this->checkUserArticleStar($id);
+        $article->is_starred = $this->checkUserArticleStar($id);
         // todo
 
         // 相关文章
@@ -179,6 +179,13 @@ class ArticleController extends CommonController
             'article' => $article,
             'related_articles' => $relatedArticles,
         ];
+    }
+
+    protected function checkUserArticleStar($id)
+    {
+        $uid = $this->getUid();
+
+        return $this->checkUserStar($uid, $id);
     }
 
     /**
