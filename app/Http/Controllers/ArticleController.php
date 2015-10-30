@@ -174,13 +174,22 @@ class ArticleController extends CommonController
         $this->origin = $article->origin;
         $relatedArticles = $this->getRelatedArticles($id);
         // 热门评论
-        // $hotComments = $this->getHotComments($id);
-        // todo
+        $hotComments = $this->getHotComments($id);
 
         return [
             'article' => $article,
             'related_articles' => $relatedArticles,
         ];
+    }
+
+    /**
+     * [getHotComments description]
+     * @param  string $id 文章id
+     * @return [type]     [description]
+     */
+    protected function getHotComments($id)
+    {
+        // todo
     }
 
     protected function checkUserArticleStar($id)
