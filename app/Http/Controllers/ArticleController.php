@@ -219,27 +219,6 @@ class ArticleController extends CommonController
         return $this->models['user']->find($uid);
     }
 
-    /**
-     * 检查用户是否收藏文章
-     *
-     * @param  string $uid       用户id
-     * @param  string $articleId 文章id
-     * @return todo
-     */
-    protected function checkUserStar($uid, $articleId)
-    {
-        $this->models['user'] = $this->dbRepository('mongodb', 'user');
-
-        $user = $this->models['user']->find($uid);
-
-        $starred = array();
-        if (array_key_exists('starred_articles', $user)) {
-            $starred = $user['starred_articles'];
-        }
-
-        return in_array($articleId, $starred);
-    }
-
     public function unstar($id)
     {
         $uid = $this->authorizer->getResourceOwnerId();
