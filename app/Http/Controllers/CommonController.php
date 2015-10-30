@@ -7,6 +7,8 @@ use DB;
 class CommonController extends ApiController
 {
 
+    protected $user;
+
     protected $models = array();
 
     /**

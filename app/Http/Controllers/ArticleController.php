@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Input;
 use Response;
+use Validator;
+use Illuminate\Http\Request;
 use App\Exceptions\ValidationException;
 use LucaDegasperi\OAuth2Server\Authorizer;
 use App\Exceptions\DuplicateOperationException;
@@ -166,7 +169,6 @@ class ArticleController extends CommonController
         $article->thumbnail_url = $this->addImagePrefixUrl($article->thumbnail_url);
         // 返回是否收藏文章
         $article->is_starred = $this->checkUserArticleStar($id);
-        // todo
 
         // 相关文章
         $this->origin = $article->origin;
@@ -235,6 +237,57 @@ class ArticleController extends CommonController
             ->pull('starred_articles', [$id]);
 
         return Response::make('', 204);
+    }
+
+    /**
+     * 文章评论
+     *
+     * @param  string $id 文章id
+     * @return [type]     [description]
+     */
+    public function comment($id, Request $request)
+    {
+        // validator
+        $validator = Validator::make($request->all(), [
+            'content' => 'required',
+        ]);
+        if ($validator->fails()) {
+            throw new ValidationException($validator->messages()->all());
+        }
+
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $this->user = $this->dbRepository('mongodb', 'user')
+            ->select('avatar_url', 'display_name')
+            ->find($uid);
+
+        return $this->commentResponse($id);
+    }
+
+    /**
+     * 文章评论返回数据
+     *
+     * @param  string $id 文章id
+     * @return todo
+     */
+    protected function commentResponse($id)
+    {
+        $article = (array) $this->article()->where('article_id', $id)
+            ->select('article_id as id', 'article_writer as origin')
+            ->first();
+
+        $insertData = [
+            'content'    => Input::get('content'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'article'    => $article,
+            'user'       => $this->user,
+        ];
+
+        $comment = $this->dbRepository('mongodb', 'article_comment');
+
+        $insertId = $comment->insertGetId($insertData);
+
+        return $comment->find($insertId);
     }
 
 }
