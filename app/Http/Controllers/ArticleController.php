@@ -371,6 +371,13 @@ class ArticleController extends CommonController
         return $reply->find($insertId);
     }
 
+    /**
+     * 文章评论匿名回复
+     * @param  string  $id        文章id
+     * @param  string  $commentId 文章评论id
+     * @param  Request $request   [description]
+     * @return todo
+     */
     public function anonymousReply($id, $commentId, Request $request)
     {
         // throw new ValidationException('验证码填写错误');
