@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Response;
 use App\Exceptions\ValidationException;
 use LucaDegasperi\OAuth2Server\Authorizer;
+use App\Exceptions\DuplicateOperationException;
 
 class ArticleController extends CommonController
 {
@@ -15,7 +17,7 @@ class ArticleController extends CommonController
     {
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
-        $this->middleware('oauth', ['only' => ['star']]);
+        $this->middleware('oauth', ['only' => ['star', 'unstar']]);
     }
 
     public function index()
@@ -237,6 +239,16 @@ class ArticleController extends CommonController
 
         return in_array($articleId, $starred);
     }
+
+    public function unstar($id)
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $this->dbRepository('mongodb', 'user')
+            ->where('_id', $uid)
+            ->pull('starred_articles', [$id]);
+
+        return Response::make('', 204);
     }
 
 }
