@@ -19,6 +19,7 @@ class ArticleController extends CommonController
     {
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
+        $this->middleware('disconnect:mongodb', ['only' => ['favour']]);
         $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply']]);
         $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
@@ -360,6 +361,49 @@ class ArticleController extends CommonController
         $this->user = MultiplexController::anonymousUser(Request::ip());
 
         return $this->replyResponse($commentId);
+    }
+
+    public function favour($id, $commentId)
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        if ($this->checkUserFavour($uid, $commentId)) {
+            throw new DuplicateOperationException('您已点赞！');
+        }
+
+        $this->models['article_comment']->where('_id', $commentId)
+            ->push('favoured_user', [$uid], true);
+
+        return $this->favourResponse($commentId);
+    }
+
+    public function unfavour($id, $commentId)
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $this->models['article_comment'] = $this->dbRepository('mongodb', 'article_comment');
+
+        $this->models['article_comment']
+            ->where('_id', $commentId)
+            ->pull('favoured_user', [$uid]);
+
+        return $this->favourResponse($commentId);
+    }
+
+    /**
+     * 赞返回数据
+     *
+     * @param  [type] $commentId [description]
+     * @return [type]            [description]
+     */
+    protected function favourResponse($commentId)
+    {
+        $comment = $this->models['article_comment']->find($commentId);
+
+        return [
+            'article_comment_id' => $commentId,
+            'favours' => count($comment['favoured_user']),
+        ];
     }
 
 }

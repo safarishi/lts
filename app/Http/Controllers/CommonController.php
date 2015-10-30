@@ -106,6 +106,33 @@ class CommonController extends ApiController
         return in_array($articleId, $starred);
     }
 
+    /**
+     * 判断用户是否点赞评论
+     *
+     * @param  string $uid       用户id
+     * @param  string $commentId 文章评论id
+     * @return boolean
+     */
+    protected function checkUserFavour($uid, $commentId)
+    {
+        $this->models['article_comment'] = $this->dbRepository('mongodb', 'article_comment');
+
+        $comment = $this->models['article_comment']
+            ->select('favoured_user')
+            ->find($commentId);
+
+        if ($comment === null) {
+            return false;
+        }
+
+        $favouredUser = array();
+        if (array_key_exists('favoured_user', $comment)) {
+            $favouredUser = $comment['favoured_user'];
+        }
+
+        return in_array($uid, $favouredUser, true);
+    }
+
     // 校验内容必填 todo
     protected function contentRequired()
     {
