@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DB;
 use Input;
+use Request;
 use Response;
 use App\Exceptions\ValidationException;
 use LucaDegasperi\OAuth2Server\Authorizer;
@@ -353,7 +354,12 @@ class ArticleController extends CommonController
      */
     public function anonymousReply($id, $commentId)
     {
-        echo 'todo';
+        throw new ValidationException('验证码填写错误');
+        // captcha todo
+
+        $this->user = MultiplexController::anonymousUser(Request::ip());
+
+        return $this->replyResponse($commentId);
     }
 
 }
