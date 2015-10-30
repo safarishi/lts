@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use DB;
 
-class CommonController extends Controller
+class CommonController extends ApiController
 {
     /**
      * [dbRepository description]
      *
      * @param  string $connection 数据库连接名
-     * @param  string $name       数据库表名
+     * @param  string $name       数据库表名（或集合名）
      * @return object
      */
     protected function dbRepository($connection, $name)

@@ -6,7 +6,7 @@ use DB;
 use App\Exceptions\ValidationException;
 use LucaDegasperi\OAuth2Server\Authorizer;
 
-class ArticleController extends ApiController
+class ArticleController extends CommonController
 {
 
     protected $origin;
