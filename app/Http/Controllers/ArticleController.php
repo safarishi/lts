@@ -163,6 +163,11 @@ class ArticleController extends CommonController
         if ($article === null) {
             throw new ValidationException('Article id parameter is wrong.');
         }
+
+        $tmp = clone $article;
+        unset($tmp->content);
+        $this->models['article'] = $tmp;
+
         // 处理文章内容里面的图片显示
         $tmpContent = str_replace('&#34;', '"', $article->content);
         $article->content = preg_replace('#(src=")/#', "\$1".'http://sisi-smu.org/', $tmpContent);
@@ -180,6 +185,7 @@ class ArticleController extends CommonController
         return [
             'article' => $article,
             'related_articles' => $relatedArticles,
+            'hot_comments' => $hotComments,
         ];
     }
 
@@ -190,7 +196,46 @@ class ArticleController extends CommonController
      */
     protected function getHotComments($id)
     {
-        // todo
+        $hotComments = $this->dbRepository('mongodb', 'article_comment')
+            ->select('content', 'created_at', 'user')
+            ->where('article.id', $id)
+            ->orderBy('created_at', 'desc')
+            ->take(2)
+            ->get();
+
+        return $this->processCommentResponse($hotComments);
+    }
+
+    protected function processCommentResponse($data)
+    {
+        $uid = $this->getUid();
+        foreach ($data as &$value) {
+            $replyId = $value['_id']->{'$id'};
+
+            $replies = $this->dbRepository('mongodb', 'reply')
+                ->select('created_at', 'content', 'user')
+                ->where('comment_id', $replyId)
+                ->orderBy('created_at', 'desc')
+                ->take(2)
+                ->get();
+
+            $nums = 0;
+            $isFavoured = false;
+            if (array_key_exists('favoured_user', $value)) {
+                $favouredUser = $value['favoured_user'];
+                $nums = count($favouredUser);
+                $isFavoured = in_array($uid, $favouredUser);
+            }
+            $value['article'] = $this->models['article'];
+            $value['favours'] = $nums;
+            $value['is_favoured'] = $isFavoured;
+            if ($replies) {
+                $value['replies'] = $replies;
+            }
+        }
+        unset($value);
+
+        return $data;
     }
 
     protected function checkUserArticleStar($id)
