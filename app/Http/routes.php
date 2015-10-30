@@ -29,4 +29,5 @@ $api->version('v1', function($api)
     $api->post('articles/{id}/anonymous_comments', 'App\Http\Controllers\ArticleController@anonymousComment');
     $api->post('oauth/access_token', 'App\Http\Controllers\OauthController@postAccessToken');
     $api->post('users', 'App\Http\Controllers\UserController@store');
+    $api->post('articles/{id}/comments/{comment_id}/replies', 'App\Http\Controllers\ArticleController@reply');
 });

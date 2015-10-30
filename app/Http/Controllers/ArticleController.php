@@ -323,4 +323,52 @@ class ArticleController extends CommonController
         return $this->commentResponse($id);
     }
 
+    /**
+     * 文章评论回复
+     *
+     * @param  string  $id        文章id
+     * @param  string  $commentId 文章评论id
+     * @param  Request $request   [description]
+     * @return array
+     */
+    public function reply($id, $commentId, Request $request)
+    {
+        // validator
+        $validator = Validator::make($request->all(), [
+            'content' => 'required',
+        ]);
+        if ($validator->fails()) {
+            throw new ValidationException($validator->messages()->all());
+        }
+
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $this->user = $this->dbRepository('mongodb', 'user')
+            ->select('avatar_url', 'display_name')
+            ->find($uid);
+
+        return $this->replyResponse($commentId);
+    }
+
+    /**
+     * [replyResponse description]
+     * @param  string $commentId 文章评论id
+     * @return array
+     */
+    protected function replyResponse($commentId)
+    {
+        $insertData = [
+            'content'    => Input::get('content'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'comment_id' => $commentId,
+            'user'       => $this->user,
+        ];
+
+        $reply = $this->dbRepository('mongodb', 'reply');
+
+        $insertId = $reply->insertGetId($insertData);
+
+        return $reply->find($insertId);
+    }
+
 }
