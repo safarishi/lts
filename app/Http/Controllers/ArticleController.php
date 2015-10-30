@@ -298,10 +298,10 @@ class ArticleController extends CommonController
      */
     public function anonymousComment($id)
     {
-        // throw new ValidationException('验证码填写错误');
+        throw new ValidationException('验证码填写错误');
         // captcha todo
 
-        $this->user = MultiplexController::anonymousUser($request->ip());
+        $this->user = MultiplexController::anonymousUser(Request::ip());
 
         return $this->commentResponse($id);
     }
