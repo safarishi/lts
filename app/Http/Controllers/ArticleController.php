@@ -18,8 +18,8 @@ class ArticleController extends CommonController
     public function __construct(Authorizer $authorizer)
     {
         parent::__construct($authorizer);
-        $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index']]);
-        $this->middleware('disconnect:mongodb', ['only' => ['favour']]);
+        $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show']]);
+        $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show']]);
         $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply']]);
         $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
@@ -210,15 +210,6 @@ class ArticleController extends CommonController
     {
         $uid = $this->getUid();
         foreach ($data as &$value) {
-            $replyId = $value['_id']->{'$id'};
-
-            $replies = $this->dbRepository('mongodb', 'reply')
-                ->select('created_at', 'content', 'user')
-                ->where('comment_id', $replyId)
-                ->orderBy('created_at', 'desc')
-                ->take(2)
-                ->get();
-
             $nums = 0;
             $isFavoured = false;
             if (array_key_exists('favoured_user', $value)) {
@@ -229,6 +220,9 @@ class ArticleController extends CommonController
             $value['article'] = $this->models['article'];
             $value['favours'] = $nums;
             $value['is_favoured'] = $isFavoured;
+
+            $replyId = $value['_id']->{'$id'};
+            $replies = $this->getReply($replyId);
             if ($replies) {
                 $value['replies'] = $replies;
             }
@@ -236,6 +230,16 @@ class ArticleController extends CommonController
         unset($value);
 
         return $data;
+    }
+
+    protected function getReply($replyId)
+    {
+        return $this->dbRepository('mongodb', 'reply')
+            ->select('created_at', 'content', 'user')
+            ->where('comment_id', $replyId)
+            ->orderBy('created_at', 'desc')
+            ->take(2)
+            ->get();
     }
 
     protected function checkUserArticleStar($id)
