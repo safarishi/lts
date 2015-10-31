@@ -19,7 +19,7 @@ class ArticleController extends CommonController
     {
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show']]);
-        $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show']]);
+        $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show', 'commentList']]);
         $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList']]);
         $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
@@ -463,7 +463,15 @@ class ArticleController extends CommonController
      */
     public function commentList($id)
     {
-        echo 'todo';
+        $this->models['article_comment'] = $this->dbRepository('mongodb', 'article_comment');
+
+        $list = $this->models['article_comment']
+            ->where('article.id', $id)
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
+
+        return ['list' => $this->handleCommentResponse($list)];
     }
 
 }

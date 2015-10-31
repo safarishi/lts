@@ -145,4 +145,46 @@ class CommonController extends ApiController
         }
     }
 
+    /**
+     * 处理评论返回数据
+     *
+     * @param  array $response [description]
+     * @return array           [description]
+     */
+    protected function handleCommentResponse($response)
+    {
+        $uid = $this->getUid();
+
+        foreach ($response as &$value) {
+            $nums = 0;
+            $isFavoured = false;
+            if (array_key_exists('favoured_user', $value)) {
+                $favouredUser = $value['favoured_user'];
+                $nums = count($favouredUser);
+                $isFavoured = in_array($uid, $favouredUser, true);
+            }
+            $value['favours'] = $nums;
+            $value['is_favoured'] = $isFavoured;
+
+            $replyId = $value['_id']->{'$id'};
+            $replies = $this->getReply($replyId);
+            if ($replies) {
+                $value['replies'] = $replies;
+            }
+        }
+        unset($value);
+
+        return $response;
+    }
+
+    protected function getReply($id)
+    {
+        return $this->dbRepository('mongodb', 'reply')
+            ->select('created_at', 'content', 'user')
+            ->where('comment_id', $replyId)
+            ->orderBy('created_at', 'desc')
+            ->take(2)
+            ->get();
+    }
+
 }
