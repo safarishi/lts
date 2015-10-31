@@ -20,7 +20,7 @@ class ArticleController extends CommonController
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show']]);
         $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show']]);
-        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply']]);
+        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList']]);
         $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
 
@@ -453,6 +453,17 @@ class ArticleController extends CommonController
             'article_comment_id' => $commentId,
             'favours' => count($comment['favoured_user']),
         ];
+    }
+
+    /**
+     * 文章评论列表
+     *
+     * @param  string $id 文章id
+     * @return [type]     [description]
+     */
+    public function commentList($id)
+    {
+        echo 'todo';
     }
 
 }

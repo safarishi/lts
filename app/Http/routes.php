@@ -32,4 +32,5 @@ $api->version('v1', function($api)
     $api->post('articles/{id}/comments/{comment_id}/anonymous_replies', 'App\Http\Controllers\ArticleController@anonymousReply');
     $api->put('articles/{id}/comments/{comment_id}/favours', 'App\Http\Controllers\ArticleController@favour');
     $api->delete('articles/{id}/comments/{comment_id}/favours', 'App\Http\Controllers\ArticleController@unfavour');
+    $api->get('articles/{id}/comments', 'App\Http\Controllers\ArticleController@commentList');
 });
