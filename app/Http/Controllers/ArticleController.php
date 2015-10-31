@@ -453,7 +453,14 @@ class ArticleController extends CommonController
             ->take(4)
             ->get();
 
-        return ['list' => $this->handleCommentResponse($list)];
+        $returnData = $this->handleCommentResponse($list);
+
+        foreach ($returnData as &$value) {
+            unset($value['favoured_user']);
+        }
+        unset($value);
+
+        return ['list' => $returnData];
     }
 
 }
