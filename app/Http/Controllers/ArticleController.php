@@ -197,7 +197,7 @@ class ArticleController extends CommonController
     protected function getHotComments($id)
     {
         $hotComments = $this->dbRepository('mongodb', 'article_comment')
-            ->select('content', 'created_at', 'user')
+            ->select('content', 'created_at', 'user', 'favoured_user')
             ->where('article.id', $id)
             ->orderBy('created_at', 'desc')
             ->take(2)
@@ -209,6 +209,7 @@ class ArticleController extends CommonController
     protected function processCommentResponse($data)
     {
         $uid = $this->getUid();
+
         foreach ($data as &$value) {
             $nums = 0;
             $isFavoured = false;
