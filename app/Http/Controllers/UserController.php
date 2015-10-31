@@ -44,12 +44,11 @@ class UserController extends CommonController
     /**
      * 用户注册
      *
-     * @param  Request $request [description]
      */
-    public function store(Request $request)
+    public function store()
     {
         // validator
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make(Input::all(), [
             'email' => 'required|email',
             'password' => 'required|min:6|confirmed',
         ]);
