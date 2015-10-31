@@ -206,41 +206,22 @@ class ArticleController extends CommonController
         return $this->processCommentResponse($hotComments);
     }
 
+    /**
+     * [processCommentResponse description]
+     * @param  array $data [description]
+     * @return array       [description]
+     */
     protected function processCommentResponse($data)
     {
-        $uid = $this->getUid();
+        $response = $this->handleCommentResponse($data);
 
-        foreach ($data as &$value) {
-            $nums = 0;
-            $isFavoured = false;
-            if (array_key_exists('favoured_user', $value)) {
-                $favouredUser = $value['favoured_user'];
-                $nums = count($favouredUser);
-                $isFavoured = in_array($uid, $favouredUser);
-            }
+        foreach ($response as &$value) {
             $value['article'] = $this->models['article'];
-            $value['favours'] = $nums;
-            $value['is_favoured'] = $isFavoured;
-
-            $replyId = $value['_id']->{'$id'};
-            $replies = $this->getReply($replyId);
-            if ($replies) {
-                $value['replies'] = $replies;
-            }
+            unset($value['favoured_user']);
         }
         unset($value);
 
-        return $data;
-    }
-
-    protected function getReply($replyId)
-    {
-        return $this->dbRepository('mongodb', 'reply')
-            ->select('created_at', 'content', 'user')
-            ->where('comment_id', $replyId)
-            ->orderBy('created_at', 'desc')
-            ->take(2)
-            ->get();
+        return $response;
     }
 
     protected function checkUserArticleStar($id)

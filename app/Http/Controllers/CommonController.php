@@ -181,7 +181,7 @@ class CommonController extends ApiController
     {
         return $this->dbRepository('mongodb', 'reply')
             ->select('created_at', 'content', 'user')
-            ->where('comment_id', $replyId)
+            ->where('comment_id', $id)
             ->orderBy('created_at', 'desc')
             ->take(2)
             ->get();
