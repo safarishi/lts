@@ -18,9 +18,9 @@ class ArticleController extends CommonController
     public function __construct(Authorizer $authorizer)
     {
         parent::__construct($authorizer);
-        $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show']]);
+        $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show', 'search', 'moreArticle']]);
         $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show', 'commentList']]);
-        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList', 'search']]);
+        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList', 'search', 'moreArticle']]);
         $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
 
@@ -496,6 +496,61 @@ class ArticleController extends CommonController
 
         return $articleModel->orderBy('article_addtime', 'desc')
             ->get();
+    }
+
+    /**
+     * 更多文章
+     *
+     * @param  string $columnId 栏目id
+     * @return todo
+     */
+    public function moreArticle($columnId)
+    {
+        $columns = $this->column()
+            ->where('lanmu_father', $columnId)
+            ->get();
+        // 没有子栏目信息
+        if (count($columns) === 0) {
+            return $this->getMoreArticleByColumnId($columnId);
+        }
+
+        foreach ($columns as $column) {
+            $column->articles = $this->getArticlesByColumnId($column->column_id);
+        }
+
+        return $this->filterArray($columns);
+    }
+
+    protected function getMoreArticleByColumnId($id)
+    {
+        $data = $this->column()
+            ->where('lanmu_id', $id)
+            ->get();
+
+        foreach ($data as $value) {
+            $value->articles = $this->article()
+                ->where('article_lanmu', $id)
+                ->orderBy('article_addtime', 'desc')
+                ->take(20)
+                ->get();
+        }
+
+        return $data;
+    }
+
+    /**
+     * 过滤数组，并重新建立数字索引
+     *
+     * @param  array $array 待处理的数组
+     * @return array        处理后的数组
+     */
+    protected function filterArray($array)
+    {
+        $result = array_filter($array, function($item) {
+            return !empty($item->articles);
+        });
+
+        return array_values($result);
     }
 
 }

@@ -34,4 +34,5 @@ $api->version('v1', function($api)
     $api->delete('articles/{id}/comments/{comment_id}/favours', 'App\Http\Controllers\ArticleController@unfavour');
     $api->get('articles/{id}/comments', 'App\Http\Controllers\ArticleController@commentList');
     $api->get('search/articles', 'App\Http\Controllers\ArticleController@search');
+    $api->get('more_articles/{column_id}', 'App\Http\Controllers\ArticleController@moreArticle');
 });
