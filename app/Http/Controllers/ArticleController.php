@@ -20,7 +20,7 @@ class ArticleController extends CommonController
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show']]);
         $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show', 'commentList']]);
-        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList']]);
+        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList', 'search']]);
         $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
 
@@ -480,6 +480,22 @@ class ArticleController extends CommonController
             ->get();
 
         return $this->handleCommentResponse($extra);
+    }
+
+    public function search()
+    {
+        // 查询关键词
+        $q = Input::get('q', '');
+
+        $articleModel = $this->article()
+            ->where('article_title', 'like', "%{$q}%")
+            ->orWhere('article_writer', 'like', "%{$q}%")
+            ->orWhere('article_whoadd', 'like', "%{$q}%");
+        // 返回数据增加分页
+        MultiplexController::addPagination($articleModel);
+
+        return $articleModel->orderBy('article_addtime', 'desc')
+            ->get();
     }
 
 }
