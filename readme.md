@@ -6,4 +6,4 @@
 
 ## api
 
-- [API](wiki)
+- [API](https://github.com/sshfl/lts/wiki)
