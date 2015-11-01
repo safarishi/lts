@@ -441,7 +441,7 @@ class ArticleController extends CommonController
      * 文章评论列表
      *
      * @param  string $id 文章id
-     * @return [type]     [description]
+     * @return array
      */
     public function commentList($id)
     {
@@ -459,8 +459,27 @@ class ArticleController extends CommonController
             unset($value['favoured_user']);
         }
         unset($value);
+        // 其他评论
+        $extra = $this->getExtraComment($id);
 
-        return ['list' => $returnData];
+        return ['list' => $returnData, 'extra' => $extra];
+    }
+
+    /**
+     * 文章其他评论
+     *
+     * @param  string $id 文章id
+     * @return array
+     */
+    protected function getExtraComment($id)
+    {
+        $extra = $this->dbRepository('mongodb', 'article_comment')
+            ->where('article.id', '<>', $id)
+            ->orderBy('created_at', 'desc')
+            ->take(2)
+            ->get();
+
+        return $this->handleCommentResponse($extra);
     }
 
 }
