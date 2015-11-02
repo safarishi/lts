@@ -15,6 +15,8 @@ class ArticleController extends CommonController
 
     protected $origin;
 
+    protected $reply = '';
+
     public function __construct(Authorizer $authorizer)
     {
         parent::__construct($authorizer);
@@ -364,8 +366,10 @@ class ArticleController extends CommonController
      */
     protected function replyResponse($commentId)
     {
+        $content = Input::get('content');
+
         $insertData = [
-            'content'    => Input::get('content'),
+            'content'    => $content,
             'created_at' => date('Y-m-d H:i:s'),
             'comment_id' => $commentId,
             'user'       => $this->user,
@@ -375,7 +379,39 @@ class ArticleController extends CommonController
 
         $insertId = $reply->insertGetId($insertData);
 
+        $this->reply = '回复：'.$content;
+        $this->recordInformation($commentId);
+
         return $reply->find($insertId);
+    }
+
+    /**
+     * 存储信息到用户信息集合
+     * 1 文章评论回复
+     * 2 文章评论匿名回复
+     * 3 文章评论点赞
+     * 4 文章评论取消点赞
+     *
+     * @param  string $commentId 文章评论id
+     * @return void
+     */
+    protected function recordInformation($commentId)
+    {
+        $comment = $this->dbRepository('mongodb', 'article_comment')
+            ->select('created_at', 'content', 'article', 'user')
+            ->find($commentId);
+
+        $insertData = array(
+                'source'     => $this->user,
+                'created_at' => date('Y-m-d H:i:s'),
+                'content'    => array(
+                        'reply'   => $this->reply,
+                        'comment' => $comment,
+                    ),
+            );
+
+        $this->dbRepository('mongodb', 'information')
+            ->insert($insertData);
     }
 
     /**
