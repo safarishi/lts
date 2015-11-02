@@ -154,6 +154,8 @@ return [
 
         'Intervention\Image\ImageServiceProvider',
 
+        Mews\Captcha\CaptchaServiceProvider::class,
+
     ],
 
     /*
@@ -206,6 +208,8 @@ return [
         'Authorizer' => LucaDegasperi\OAuth2Server\Facades\Authorizer::class,
 
         'Image' => 'Intervention\Image\Facades\Image',
+
+        'Captcha' => Mews\Captcha\Facades\Captcha::class,
 
     ],
 
