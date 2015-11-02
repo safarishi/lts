@@ -94,4 +94,20 @@ class UserController extends CommonController
         return Response::make('', 204);
     }
 
+    public function myComment()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $this->models['article_comment'] = $this->dbRepository('mongodb', 'article_comment');
+        $commentModel = $this->models['article_comment']
+            ->where('user._id', $uid)
+            ->orderBy('created_at', 'desc');
+
+        MultiplexController::addPagination($commentModel);
+
+        $data = $commentModel->get();
+
+        return $this->handleCommentResponse($data);
+    }
+
 }
