@@ -41,4 +41,5 @@ $api->version('v1', function($api)
     $api->get('more_articles/{column_id}', 'App\Http\Controllers\ArticleController@moreArticle');
     $api->get('user', 'App\Http\Controllers\UserController@show');
     $api->get('user/comments', 'App\Http\Controllers\UserController@myComment');
+    $api->get('user/stars', 'App\Http\Controllers\UserController@myStar');
 });

@@ -110,4 +110,25 @@ class UserController extends CommonController
         return $this->handleCommentResponse($data);
     }
 
+    public function myStar()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $user = $this->dbRepository('mongodb', 'user')->find($uid);
+
+        $articleIds = array();
+        if (array_key_exists('starred_articles', $user)) {
+            $articleIds = $user['starred_articles'];
+        } else {
+            return [];
+        }
+
+        $articleModel = $this->article()
+            ->whereIn('article_id', $articleIds);
+
+        MultiplexController::addPagination($articleModel);
+
+        return $articleModel->get();
+    }
+
 }
