@@ -10,10 +10,16 @@ use Config;
 use Captcha;
 use Session;
 use Validator;
+use Socialite;
 use App\Exceptions\ValidationException;
 
 class MultiplexController extends CommonController
 {
+
+    protected $curlUrl = '';
+
+    protected $curlMethod = 'GET';
+
     public static function anonymousUser($ip)
     {
         $area = self::getArea($ip);
@@ -185,6 +191,162 @@ class MultiplexController extends CommonController
         }
         // 验证码验证通过后删除临时 token 数据
         $tmp->where('token', $token)->delete();
+    }
+
+    public function generateWeiboUrl()
+    {
+        $config = Config::get('services.weibo');
+
+        $url = 'https://api.weibo.com/oauth2/authorize?client_id='.
+            $config['client_id'].'&redirect_uri='.
+            urlencode($config['redirect']).'&response_type=code';
+
+        return $url;
+    }
+
+    public function weiboCallback()
+    {
+        $config = Config::get('services.weibo');
+
+        $this->curlUrl = 'https://api.weibo.com/oauth2/access_token?client_id='.
+            $config['client_id'].'&client_secret='.
+            $config['client_secret'].'&grant_type=authorization_code&redirect_uri='.
+            urlencode($config['redirect']).'&code='.
+            Input::get('code');
+
+        $this->curlMethod = 'POST';
+
+        $outcome = $this->curlOperate();
+        // 获取 open id
+        $openId = $outcome->uid;
+
+        $result = $this->hasOpenId($openId);
+        if ($result) {
+            return $result;
+        }
+
+        $userInfo = $this->fetchUserInfo($outcome->access_token, $openId);
+        $avatar_url = $userInfo->avatar_hd ? $userInfo->avatar_hd : $userInfo->avatar_large;
+
+        $tmpToken = self::temporaryToken();
+
+        $this->storeOpenId($openId, $tmpToken);
+
+        return 'store success';
+    }
+
+    /**
+     * 检查第三方登录的 open id 是否存在
+     *
+     * @param  string  $openId
+     * @return string|false
+     */
+    protected function hasOpenId($openId)
+    {
+        $exist = DB::connection('mongodb')->collection('user')
+            ->where('addition.open_id', $openId)
+            ->first();
+
+        if ($exist === null) {
+            return false;
+        }
+
+        return $exist['addition']['token'];
+    }
+
+    protected function storeOpenId($openId, $tmpToken)
+    {
+        $user = DB::connection('mongodb')->collection('user');
+
+        $insertData = [
+            'created_at' => date('Y-m-d H:i:s'),
+            'addition' => array(
+                    'open_id' => $openId,
+                    'token'   => $tmpToken,
+                ),
+        ];
+
+        $user->insert($insertData);
+    }
+
+    protected function fetchUserInfo($accessToken, $uid)
+    {
+        $this->curlUrl    = 'https://api.weibo.com/2/users/show.json?access_token='.$accessToken.'&uid='.$uid;
+        $this->curlMethod = 'GET';
+
+        return $this->curlOperate();
+    }
+
+    /**
+     *
+     * @return object
+     *
+     * @throws Rootant\Api\Exception\AuthorizationEntryException
+     */
+    protected function curlOperate()
+    {
+        // curl
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => $this->curlUrl,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 30,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => $this->curlMethod,
+          CURLOPT_SSL_VERIFYPEER => false,
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+          echo "cURL Error #:" . $err;
+        } else {
+          return json_decode($response);
+        }
+    }
+
+    /**
+     * 根据 token 获取用户的登录口令
+     *
+     * @return array
+     */
+    public function entry()
+    {
+        $token = self::validateToken();
+
+        $exist = DB::connection('mongodb')->collection('user')
+            ->where('addition.token', $token)
+            ->first();
+
+        if ($exist === null) {
+            throw new ValidationException('无效的 token');
+        }
+
+        return $exist['entry'];
+    }
+
+    /**
+     * 校验传递过来的 token 参数
+     *
+     * @return string
+     *
+     * @throws \App\Exceptions\ValidationException
+     */
+    public static function validateToken()
+    {
+        $token = Input::get('token');
+
+        if (strlen($token) !== 30) {
+            throw new ValidationException('token 参数传递错误');
+        }
+
+        return $token;
     }
 
 }

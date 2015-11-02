@@ -51,4 +51,9 @@ $api->version('v1', function($api)
     // generate token
     $api->get('generate_token', 'App\Http\Controllers\MultiplexController@generateToken');
     $api->get('generate_captcha', 'App\Http\Controllers\MultiplexController@generateCaptcha');
+    $api->get('weibo_url', 'App\Http\Controllers\MultiplexController@generateWeiboUrl');
+    $api->get('weibo_callback', 'App\Http\Controllers\MultiplexController@weiboCallback');
+
+
+    $api->get('entry', 'App\Http\Controllers\MultiplexController@entry');
 });

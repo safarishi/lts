@@ -35,6 +35,10 @@ class UserController extends CommonController
      */
     public function storeEmail()
     {
+        if (!Input::has('email')) {
+            throw new ValidationException('邮箱不可为空');
+        }
+
         $this->email = Input::get('email');
 
         $this->models['user'] = $this->dbRepository('mongodb', 'user');
@@ -75,7 +79,41 @@ class UserController extends CommonController
 
         $insertId = $this->models['user']->insertGetId($insertData);
 
+        // store the thrid party user info
+        $this->storeThirdPartyUser($this->email, $password);
+
         return $this->models['user']->find($insertId);
+    }
+
+    /**
+     * store the third party user info
+     *
+     * @param  string $username 登录名
+     * @param  string $password 登录密码
+     * @return void
+     */
+    protected function storeThirdPartyUser($username, $password)
+    {
+        if (!Input::has('token')) {
+            return;
+        }
+
+        $token = Input::get('token');
+
+        if (strlen($token) !== 30) {
+            return;
+        }
+
+        $updateData = [
+            'entry' => array(
+                    'username' => $username,
+                    'password' => $password,
+                )
+        ];
+
+        DB::connection('mongodb')->collection('user')
+            ->where('addition.token', $token)
+            ->update($updateData);
     }
 
     public function show()

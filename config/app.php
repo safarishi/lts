@@ -152,9 +152,9 @@ return [
 
         Jenssegers\Mongodb\MongodbServiceProvider::class,
 
-        'Intervention\Image\ImageServiceProvider',
-
         Mews\Captcha\CaptchaServiceProvider::class,
+
+        'Intervention\Image\ImageServiceProvider',
 
     ],
 
@@ -207,9 +207,9 @@ return [
 
         'Authorizer' => LucaDegasperi\OAuth2Server\Facades\Authorizer::class,
 
-        'Image' => 'Intervention\Image\Facades\Image',
-
         'Captcha' => Mews\Captcha\Facades\Captcha::class,
+
+        'Image' => 'Intervention\Image\Facades\Image',
 
     ],
 
