@@ -26,8 +26,12 @@ $api->version('v1', function($api)
     $api->delete('articles/{id}/stars', 'App\Http\Controllers\ArticleController@unstar');
     $api->post('articles/{id}/comments', 'App\Http\Controllers\ArticleController@comment');
     $api->post('articles/{id}/anonymous_comments', 'App\Http\Controllers\ArticleController@anonymousComment');
-    $api->post('oauth/access_token', 'App\Http\Controllers\OauthController@postAccessToken');
+    // 用户注册
     $api->post('users', 'App\Http\Controllers\UserController@store');
+    // 用户登录
+    $api->post('oauth/access_token', 'App\Http\Controllers\OauthController@postAccessToken');
+    // 退出登录
+    $api->delete('oauth/invalidate_token', 'App\Http\Controllers\UserController@logout');
     $api->post('articles/{id}/comments/{comment_id}/replies', 'App\Http\Controllers\ArticleController@reply');
     $api->post('articles/{id}/comments/{comment_id}/anonymous_replies', 'App\Http\Controllers\ArticleController@anonymousReply');
     $api->put('articles/{id}/comments/{comment_id}/favours', 'App\Http\Controllers\ArticleController@favour');

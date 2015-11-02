@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Hash;
 use Input;
+use Response;
 use Validator;
 use Illuminate\Http\Request;
 use App\Exceptions\ValidationException;
@@ -77,4 +79,14 @@ class UserController extends CommonController
     {
         echo 'todo';
     }
+
+    public function logout()
+    {
+        $oauthAccessToken = DB::table('oauth_access_tokens');
+
+        $oauthAccessToken->where('id', $this->accessToken)->delete();
+
+        return Response::make('', 204);
+    }
+
 }
