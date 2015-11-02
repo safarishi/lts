@@ -131,4 +131,9 @@ class UserController extends CommonController
         return $articleModel->get();
     }
 
+    public function myInformation()
+    {
+        // todo
+    }
+
 }

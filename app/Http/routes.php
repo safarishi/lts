@@ -42,4 +42,5 @@ $api->version('v1', function($api)
     $api->get('user', 'App\Http\Controllers\UserController@show');
     $api->get('user/comments', 'App\Http\Controllers\UserController@myComment');
     $api->get('user/stars', 'App\Http\Controllers\UserController@myStar');
+    $api->get('user/informations', 'App\Http\Controllers\UserController@myInformation');
 });
