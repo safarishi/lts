@@ -9,7 +9,8 @@
         "laravel/framework": "5.1.*",
         "lucadegasperi/oauth2-server-laravel": "5.0.*",
         "dingo/api": "1.0.x@dev",
-        "jenssegers/mongodb": "2.2.*"
+        "jenssegers/mongodb": "2.2.*",
+        "intervention/imagecache": "^2.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

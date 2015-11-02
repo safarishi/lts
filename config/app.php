@@ -152,6 +152,8 @@ return [
 
         Jenssegers\Mongodb\MongodbServiceProvider::class,
 
+        'Intervention\Image\ImageServiceProvider',
+
     ],
 
     /*
@@ -202,6 +204,8 @@ return [
         'View'      => Illuminate\Support\Facades\View::class,
 
         'Authorizer' => LucaDegasperi\OAuth2Server\Facades\Authorizer::class,
+
+        'Image' => 'Intervention\Image\Facades\Image',
 
     ],
 
