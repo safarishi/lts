@@ -53,7 +53,12 @@ $api->version('v1', function($api)
     $api->get('generate_captcha', 'App\Http\Controllers\MultiplexController@generateCaptcha');
     $api->get('weibo_url', 'App\Http\Controllers\MultiplexController@generateWeiboUrl');
     $api->get('weibo_callback', 'App\Http\Controllers\MultiplexController@weiboCallback');
-
+    $api->get('qq_url', 'App\Http\Controllers\MultiplexController@generateQqUrl');
 
     $api->get('entry', 'App\Http\Controllers\MultiplexController@entry');
+});
+
+Route::group(array('prefix' => 'v2'), function()
+{
+    Route::get('qq_callback', 'MultiplexController@qqCallback');
 });

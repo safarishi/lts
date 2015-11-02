@@ -216,7 +216,7 @@ class MultiplexController extends CommonController
 
         $this->curlMethod = 'POST';
 
-        $outcome = $this->curlOperate();
+        $outcome = json_decode($this->curlOperate());
         // 获取 open id
         $openId = $outcome->uid;
 
@@ -307,7 +307,7 @@ class MultiplexController extends CommonController
         if ($err) {
           echo "cURL Error #:" . $err;
         } else {
-          return json_decode($response);
+          return $response;
         }
     }
 
@@ -347,6 +347,41 @@ class MultiplexController extends CommonController
         }
 
         return $token;
+    }
+
+    public function generateQqUrl()
+    {
+        $config = Config::get('services.qq');
+
+        $url = 'https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id='.
+            $config['app_id'].'&redirect_uri='.
+            urlencode($config['redirect']).'&state=test';
+
+        return $url;
+    }
+
+    public function qqCallback()
+    {
+        $config = Config::get('services.qq');
+
+        $this->curlUrl = 'https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id='.
+            $config['app_id'].'&client_secret='.
+            $config['app_key'].'&code='.
+            Input::get('code').'&redirect_uri='.
+            urlencode($config['redirect']);
+
+        $outcome = $this->curlOperate();
+
+        $accessToken = explode('=', explode('&', $outcome)[0])[1];
+
+        $this->curlUrl = 'https://graph.qq.com/oauth2.0/me?access_token='.$accessToken;
+        $result = $this->curlOperate();
+        var_dump($result);
+        // todo
+        /*
+            string 'callback( {"client_id":"101257109","openid":"292FC6D986316F300806E42DA87EDC75"} );
+' (length=83)
+         */
     }
 
 }

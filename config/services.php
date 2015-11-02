@@ -41,4 +41,10 @@ return [
         'redirect' => env('WEIBO_REDIRECT_URI'),
     ],
 
+    'qq' => [
+        'app_id' => env('APP_ID'),
+        'app_key' => env('APP_SECRET'),
+        'redirect' => env('REDIRECT'),
+    ],
+
 ];
