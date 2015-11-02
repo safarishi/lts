@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use DB;
+use Hash;
 use Input;
 use Image;
 use Config;
+use Captcha;
+use Session;
+use Validator;
+use App\Exceptions\ValidationException;
 
 class MultiplexController extends CommonController
 {
@@ -86,6 +92,99 @@ class MultiplexController extends CommonController
         Image::make(Input::file('avatar_url'))->encode($ext)->save($storageDir.$storageName.'.'.$ext);
 
         return Config::get('imagecache.paths.avatar_url_prefix').'/'.$storagePath;
+    }
+
+    public function generateToken()
+    {
+        echo self::temporaryToken();
+    }
+
+    /**
+     * 临时 token
+     *
+     * @return string
+     */
+    public static function temporaryToken()
+    {
+        $randomStr = self::generateRandomStr(7);
+
+        return uniqid($randomStr, true);
+    }
+
+    /**
+     * 随机生成默认长度6位由字母、数字组成的字符串
+     *
+     * @param  integer $length
+     * @return string          随机生成的字符串
+     */
+    public static function generateRandomStr($length = 6)
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $str   = '';
+        for ($i = 0; $i < $length; $i++) {
+            $str .= $chars[mt_rand(0, strlen($chars) - 1)];
+        }
+        return $str;
+    }
+
+    public function generateCaptcha()
+    {
+        $token = Input::get('token');
+
+        if (strlen($token) !== 30) {
+            throw new ValidationException('token 参数传递错误');
+        }
+
+        $mayNeedReturn = Captcha::create();
+        // todo
+
+        $captcha = Session::get('captcha');
+
+        $insertData = [
+            'captcha'    => $captcha['key'],
+            'token'      => $token,
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+
+        DB::connection('mongodb')->collection('tmp')
+            ->insert($insertData);
+    }
+
+    /**
+     * 校验验证码
+     *
+     * @return void
+     *
+     * @throws \App\Exceptions\Validation
+     */
+    public static function verifyCaptcha()
+    {
+        $token   = Input::get('token');
+        $captcha = Input::get('captcha');
+
+        $validator = Validator::make(Input::only('captcha', 'token'), [
+                'captcha' => 'required',
+                'token'   => 'required',
+            ]);
+
+        if ($validator->fails()) {
+            $messages = $validator->messages();
+            throw new ValidationException($messages->all());
+        }
+
+        $tmp = DB::connection('mongodb')->collection('tmp');
+
+        $data = $tmp->where('token', $token)->first();
+
+        if ($data === null) {
+            throw new ValidationException('无效的 token');
+        }
+
+        if (!Hash::check(mb_strtolower($captcha), $data['captcha'])) {
+            throw new ValidationException('验证码填写不正确');
+        }
+        // 验证码验证通过后删除临时 token 数据
+        $tmp->where('token', $token)->delete();
     }
 
 }

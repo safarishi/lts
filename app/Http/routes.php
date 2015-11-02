@@ -48,4 +48,7 @@ $api->version('v1', function($api)
     $api->post('user', 'App\Http\Controllers\UserController@modify');
     $api->get('products', 'App\Http\Controllers\ArticleController@product');
     $api->get('teams', 'App\Http\Controllers\ArticleController@team');
+    // generate token
+    $api->get('generate_token', 'App\Http\Controllers\MultiplexController@generateToken');
+    $api->get('generate_captcha', 'App\Http\Controllers\MultiplexController@generateCaptcha');
 });
