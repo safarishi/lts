@@ -18,6 +18,7 @@ class UserController extends CommonController
 
     public function __construct(Authorizer $authorizer)
     {
+        parent::__construct($authorizer);
         $this->middleware('oauth', ['except' => 'store']);
         // before middleware
         $this->middleware('oauth.checkClient', ['only' => 'store']);
