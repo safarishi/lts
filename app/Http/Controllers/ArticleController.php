@@ -334,8 +334,8 @@ class ArticleController extends CommonController
      */
     public function anonymousComment($id)
     {
-        throw new ValidationException('验证码填写错误');
-        // captcha todo
+        // 校验验证码
+        MultiplexController::verifyCaptcha();
 
         $this->user = MultiplexController::anonymousUser(Request::ip());
 
@@ -423,8 +423,8 @@ class ArticleController extends CommonController
      */
     public function anonymousReply($id, $commentId)
     {
-        throw new ValidationException('验证码填写错误');
-        // captcha todo
+        // 校验验证码
+        MultiplexController::verifyCaptcha();
 
         $this->user = MultiplexController::anonymousUser(Request::ip());
 
