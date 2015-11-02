@@ -6,3 +6,4 @@ Homestead.json
 /database/migrations
 composer.lock
 /config/database.php
+/public/uploads
