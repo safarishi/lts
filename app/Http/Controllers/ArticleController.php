@@ -20,10 +20,10 @@ class ArticleController extends CommonController
     public function __construct(Authorizer $authorizer)
     {
         parent::__construct($authorizer);
-        $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show', 'search', 'moreArticle', 'myStar']]);
+        $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show', 'search', 'moreArticle', 'myStar', 'team']]);
         $this->middleware('disconnect:sqlsrv2', ['only' => ['product']]);
         $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show', 'commentList', 'myComment', 'myStar', 'myInformation']]);
-        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList', 'search', 'moreArticle', 'product']]);
+        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList', 'search', 'moreArticle', 'product', 'team']]);
         $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
 
@@ -610,6 +610,25 @@ class ArticleController extends CommonController
             ->where('info_id', 5)
             ->first()
             ->info_desc_cn;
+    }
+
+    public function team()
+    {
+        $teamModel = $this->dbRepository('sqlsrv', 'expert')
+            ->select('expert_id as id', 'expert_photo as avatar_url', 'expert_name as name', 'expert_title as position', 'expert_Description as description')
+            ->where('expert_language', 'zh-cn')
+            ->whereIn('expert_type', ['领导', '研究人员'])
+            ->orderBy('expert_order', 'desc');
+
+        MultiplexController::addPagination($teamModel);
+
+        $members = $teamModel->get();
+
+        foreach ($members as $member) {
+            $member->avatar_url = $this->addImagePrefixUrl($member->avatar_url);
+        }
+
+        return $members;
     }
 
 }
