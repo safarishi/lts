@@ -433,6 +433,9 @@ class ArticleController extends CommonController
     public function favour($id, $commentId)
     {
         $uid = $this->authorizer->getResourceOwnerId();
+        $this->user = $this->dbRepository('mongodb', 'user')
+            ->select('display_name', 'avatar_url')
+            ->find($uid);
 
         if ($this->checkUserFavour($uid, $commentId)) {
             throw new DuplicateOperationException('您已点赞！');
@@ -441,12 +444,23 @@ class ArticleController extends CommonController
         $this->models['article_comment']->where('_id', $commentId)
             ->push('favoured_user', [$uid], true);
 
+        $this->reply = '赞了这条评论:)';
+        $this->recordInformation($commentId);
+
         return $this->favourResponse($commentId);
     }
 
     public function unfavour($id, $commentId)
     {
         $uid = $this->authorizer->getResourceOwnerId();
+        $this->user = $this->dbRepository('mongodb', 'user')
+            ->select('display_name', 'avatar_url')
+            ->find($uid);
+
+        if ($this->checkUserFavour($uid, $commentId)) {
+            $this->reply = '取消了这条评论的赞:(';
+            $this->recordInformation($commentId);
+        }
 
         $this->models['article_comment'] = $this->dbRepository('mongodb', 'article_comment');
 
