@@ -133,7 +133,16 @@ class UserController extends CommonController
 
     public function myInformation()
     {
-        // todo
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $model = $this->dbRepository('mongodb', 'information')
+            ->where('content.comment.user._id', $uid)
+            ->orderBy('created_at', 'desc');
+
+        // 增加数据分页
+        MultiplexController::addPagination($model);
+
+        return $model->get();
     }
 
 }
