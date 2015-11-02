@@ -21,8 +21,9 @@ class ArticleController extends CommonController
     {
         parent::__construct($authorizer);
         $this->middleware('disconnect:sqlsrv', ['only' => ['report', 'index', 'show', 'search', 'moreArticle', 'myStar']]);
+        $this->middleware('disconnect:sqlsrv2', ['only' => ['product']]);
         $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show', 'commentList', 'myComment', 'myStar', 'myInformation']]);
-        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList', 'search', 'moreArticle']]);
+        $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList', 'search', 'moreArticle', 'product']]);
         $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
     }
 
@@ -601,6 +602,14 @@ class ArticleController extends CommonController
         });
 
         return array_values($result);
+    }
+
+    public function product()
+    {
+        echo $this->dbRepository('sqlsrv2', 'info')
+            ->where('info_id', 5)
+            ->first()
+            ->info_desc_cn;
     }
 
 }

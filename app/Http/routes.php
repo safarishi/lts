@@ -46,4 +46,5 @@ $api->version('v1', function($api)
     $api->get('user/informations', 'App\Http\Controllers\UserController@myInformation');
     // 修改用户个人信息
     $api->post('user', 'App\Http\Controllers\UserController@modify');
+    $api->get('products', 'App\Http\Controllers\ArticleController@product');
 });
