@@ -76,9 +76,13 @@ class UserController extends CommonController
         return $this->models['user']->find($insertId);
     }
 
-    public function show($id)
+    public function show()
     {
-        echo 'todo';
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        return $this->dbRepository('mongodb', 'user')
+            ->select('avatar_url', 'email', 'gender', 'display_name', 'company')
+            ->find($uid);
     }
 
     public function logout()

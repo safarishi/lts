@@ -39,4 +39,5 @@ $api->version('v1', function($api)
     $api->get('articles/{id}/comments', 'App\Http\Controllers\ArticleController@commentList');
     $api->get('search/articles', 'App\Http\Controllers\ArticleController@search');
     $api->get('more_articles/{column_id}', 'App\Http\Controllers\ArticleController@moreArticle');
+    $api->get('user', 'App\Http\Controllers\UserController@show');
 });
