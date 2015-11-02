@@ -166,9 +166,14 @@ class UserController extends CommonController
         }
     }
 
-    public function modify()
+    /**
+     * 修改用户信息前的校验
+     *
+     * @param  string $uid 用户id
+     * @return void
+     */
+    protected function prepareModify($uid)
     {
-        $uid = $this->authorizer->getResourceOwnerId();
         // validator
         $validator = Validator::make(Input::all(), [
             'email'  => 'email',
@@ -181,19 +186,25 @@ class UserController extends CommonController
         if (Input::has('email')) {
             $this->validateEmail($uid);
         }
+    }
+
+    public function modify()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+        $this->prepareModify($uid);
 
         $user = User::find($uid);
 
         $allowedFields = ['avatar_url', 'display_name', 'gender', 'email', 'company'];
 
-        array_walk($allowedFields, function($item) use ($user) {
+        array_walk($allowedFields, function($item) use ($user, $uid) {
             $v = Input::get($item);
             if ($v && $item !== 'avatar_url') {
                 $user->$item = $v;
             }
-            // if (Input::hasFile('avatar_url')) {
-            //     $user->avatar_url = UserAvatarApiController::uploadAvatar($this->uid);
-            // }
+            if (Input::hasFile('avatar_url')) {
+                $user->avatar_url = MultiplexController::uploadAvatar($uid);
+            }
         });
 
         $user->save();
