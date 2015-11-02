@@ -6,6 +6,7 @@ use DB;
 use Hash;
 use Input;
 use Response;
+use App\User;
 use Validator;
 use Illuminate\Http\Request;
 use App\Exceptions\ValidationException;
@@ -143,6 +144,61 @@ class UserController extends CommonController
         MultiplexController::addPagination($model);
 
         return $model->get();
+    }
+
+    /**
+     * 修改用户信息的时候校验邮箱唯一性
+     *
+     * @param  string $uid 用户id
+     * @return void
+     *
+     * @throws \App\Exceptions\ValidationException
+     */
+    protected function validateEmail($uid)
+    {
+        $outcome = $this->dbRepository('mongodb', 'user')
+            ->where('_id', '<>', $uid)
+            ->where('email', Input::get('email'))
+            ->first();
+
+        if ($outcome) {
+            throw new ValidationException('邮箱已被占用');
+        }
+    }
+
+    public function modify()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+        // validator
+        $validator = Validator::make(Input::all(), [
+            'email'  => 'email',
+            'gender' => 'in:男,女',
+        ]);
+        if ($validator->fails()) {
+            throw new ValidationException($validator->messages()->all());
+        }
+
+        if (Input::has('email')) {
+            $this->validateEmail($uid);
+        }
+
+        $user = User::find($uid);
+
+        $allowedFields = ['avatar_url', 'display_name', 'gender', 'email', 'company'];
+
+        array_walk($allowedFields, function($item) use ($user) {
+            $v = Input::get($item);
+            if ($v && $item !== 'avatar_url') {
+                $user->$item = $v;
+            }
+            // if (Input::hasFile('avatar_url')) {
+            //     $user->avatar_url = UserAvatarApiController::uploadAvatar($this->uid);
+            // }
+        });
+
+        $user->save();
+
+        return $this->dbRepository('mongodb', 'user')->find($uid);
     }
 
 }
