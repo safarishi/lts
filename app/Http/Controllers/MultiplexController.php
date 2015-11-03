@@ -10,7 +10,6 @@ use Config;
 use Captcha;
 use Session;
 use Validator;
-use Socialite;
 use App\Exceptions\ValidationException;
 
 class MultiplexController extends CommonController
