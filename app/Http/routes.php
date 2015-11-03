@@ -51,6 +51,7 @@ $api->version('v1', function($api)
     // generate token
     $api->get('generate_token', 'App\Http\Controllers\MultiplexController@generateToken');
     $api->get('generate_captcha', 'App\Http\Controllers\MultiplexController@generateCaptcha');
+    // third party login
     $api->get('weibo_url', 'App\Http\Controllers\MultiplexController@generateWeiboUrl');
     $api->get('weibo_callback', 'App\Http\Controllers\MultiplexController@weiboCallback');
     $api->get('qq_url', 'App\Http\Controllers\MultiplexController@generateQqUrl');
