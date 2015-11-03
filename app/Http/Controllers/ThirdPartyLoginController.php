@@ -60,14 +60,6 @@ class ThirdPartyLoginController extends CommonController
         return $outcome->uid;
     }
 
-    protected function fetchWeiboUser($uid)
-    {
-        $this->curlUrl    = 'https://api.weibo.com/2/users/show.json?access_token='.$this->accessToken.'&uid='.$uid;
-        $this->curlMethod = 'GET';
-
-        return $this->curlOperate();
-    }
-
     protected function fetchUser($openId)
     {
         switch ($this->type) {
@@ -232,15 +224,6 @@ class ThirdPartyLoginController extends CommonController
         return json_decode($jsonStr)->openid;
     }
 
-    protected function fetchQqUser($openId)
-    {
-        $this->curlUrl = 'https://graph.qq.com/user/get_user_info?access_token='.
-        $this->accessToken.'&openid='.
-        $openId.'&appid='.$this->serviceConfig['AppId'];
-
-        return $this->curlOperate();
-    }
-
     /**
      * 生成微信第三方登录 url
      *
@@ -335,15 +318,6 @@ class ThirdPartyLoginController extends CommonController
         $this->accessToken = $outcome->access_token;
 
         return $outcome->openid;
-    }
-
-    protected function fetchWeixinUser($openId)
-    {
-        $this->curlUrl = 'https://api.weixin.qq.com/sns/userinfo?access_token='.
-            $this->accessToken.'&openid='.
-            $openId.'&lang=zh_CN';
-
-        return json_decode($this->curlOperate());
     }
 
     /**
