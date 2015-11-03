@@ -47,4 +47,10 @@ return [
         'redirect' => env('REDIRECT'),
     ],
 
+    'weixin' => array(
+        'AppID' => 'wx30fb0b0645a45dsf4a',
+        'AppSecret' => 'ddfc88f42a0c7d6f1fac4a612df6asc720e1',
+        'CallbackUrl' => 'http://csi.rootant.org/v3/weixin_callback',
+    ),
+
 ];

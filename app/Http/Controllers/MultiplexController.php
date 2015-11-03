@@ -429,4 +429,67 @@ class MultiplexController extends CommonController
         return json_decode($jsonStr)->openid;
     }
 
+    /**
+     * 生成微信第三方登录 url
+     *
+     * @return string
+     */
+    public function generateWeixinUrl()
+    {
+        $config = Config::get('services.weixin');
+
+        $url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='
+            .$config['AppID'].'&redirect_uri='
+            .urlencode($config['CallbackUrl'])
+            .'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect';
+
+        return $url;
+    }
+
+    public function weixinCallback()
+    {
+        $openId = $this->getWeixinOpenId();
+
+        $result = $this->hasOpenId($openId);
+        if ($result) {
+            return 'See open id '.$result;
+        }
+
+        // 拉取第三方用户信息
+        $weixinUser = $this->fetchWeixinUser($openId);
+        $avatarUrl = $weixinUser->headimgurl;
+
+        $tmpToken = self::temporaryToken();
+        $this->storeOpenId($openId, $tmpToken);
+
+        return 'QueryString ?avatar_url='.$avatarUrl.'&token='.$tmpToken;
+    }
+
+    protected function getWeixinOpenId()
+    {
+        $code = Input::get('code');
+
+        $this->serviceConfig = Config::get('services.weixin');
+
+        $this->curlUrl = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='
+            .$this->serviceConfig['AppID'].'&secret='
+            .$this->serviceConfig['AppSecret'].'&code='
+            .$code.'&grant_type=authorization_code';
+
+        $outcome = json_decode($this->curlOperate());
+
+        $this->accessToken = $outcome->access_token;
+
+        return $outcome->openid;
+    }
+
+    protected function fetchWeixinUser($openId)
+    {
+        $this->curlUrl = 'https://api.weixin.qq.com/sns/userinfo?access_token='.
+            $this->accessToken.'&openid='.
+            $openId.'&lang=zh_CN';
+
+        return json_decode($this->curlOperate());
+    }
+
 }

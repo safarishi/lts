@@ -54,11 +54,18 @@ $api->version('v1', function($api)
     $api->get('weibo_url', 'App\Http\Controllers\MultiplexController@generateWeiboUrl');
     $api->get('weibo_callback', 'App\Http\Controllers\MultiplexController@weiboCallback');
     $api->get('qq_url', 'App\Http\Controllers\MultiplexController@generateQqUrl');
-
+    $api->get('weixin_url', 'App\Http\Controllers\MultiplexController@generateWeixinUrl');
     $api->get('entry', 'App\Http\Controllers\MultiplexController@entry');
 });
 
 Route::group(array('prefix' => 'v2'), function()
 {
+    // route for qq callback
     Route::get('qq_callback', 'MultiplexController@qqCallback');
+});
+
+Route::group(array('prefix' => 'v3'), function()
+{
+    // route for weinxi callback
+    Route::get('weixin_callback', 'MultiplexController@weixinCallback');
 });
