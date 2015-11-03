@@ -22,6 +22,7 @@ class ThirdPartyLoginController extends CommonController
 
     public function weiboCallback()
     {
+        $this->type = 'weibo';
         // 获取 open id
         $openId = $this->getWeiboOpenId();
 
@@ -30,15 +31,14 @@ class ThirdPartyLoginController extends CommonController
             return $result;
         }
 
-        $weixinUser = $this->fetchWeiboUser($this->accessToken, $openId);
-        $user = json_decode($weixinUser);
-        $avatar_url = $user->avatar_hd ? $user->avatar_hd : $user->avatar_large;
+        $user = $this->fetchUser($openId);
+        $avatarUrl = $user->avatar_hd ? $user->avatar_hd : $user->avatar_large;
 
         $tmpToken = MultiplexController::temporaryToken();
 
         $this->storeOpenId($openId, $tmpToken);
 
-        return 'store success';
+        return 'QueryString ?avatar_url='.$avatarUrl.'&token='.$tmpToken;
     }
 
     protected function getWeiboOpenId()
@@ -60,12 +60,37 @@ class ThirdPartyLoginController extends CommonController
         return $outcome->uid;
     }
 
-    protected function fetchWeiboUser($accessToken, $uid)
+    protected function fetchWeiboUser($uid)
     {
-        $this->curlUrl    = 'https://api.weibo.com/2/users/show.json?access_token='.$accessToken.'&uid='.$uid;
+        $this->curlUrl    = 'https://api.weibo.com/2/users/show.json?access_token='.$this->accessToken.'&uid='.$uid;
         $this->curlMethod = 'GET';
 
         return $this->curlOperate();
+    }
+
+    protected function fetchUser($openId)
+    {
+        switch ($this->type) {
+            case 'weibo':
+                $this->curlUrl    = 'https://api.weibo.com/2/users/show.json?access_token='.$this->accessToken.'&uid='.$openId;
+                $this->curlMethod = 'GET';
+                break;
+            case 'qq':
+                $this->curlUrl = 'https://graph.qq.com/user/get_user_info?access_token='.
+                    $this->accessToken.'&openid='.
+                    $openId.'&appid='.$this->serviceConfig['AppId'];
+                break;
+            case 'weixin':
+                $this->curlUrl = 'https://api.weixin.qq.com/sns/userinfo?access_token='.
+                    $this->accessToken.'&openid='.
+                    $openId.'&lang=zh_CN';
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        return json_decode($this->curlOperate());
     }
 
     /**
@@ -153,6 +178,8 @@ class ThirdPartyLoginController extends CommonController
 
     public function qqCallback()
     {
+        $this->type = 'qq';
+
         if (Input::get('state') !== 'test') {
             // todo
             return;
@@ -165,9 +192,7 @@ class ThirdPartyLoginController extends CommonController
             return 'See open id '.$result;
         }
 
-        $qqUser = $this->fetchQqUser($openId);
-        // json decode
-        $user = json_decode($qqUser);
+        $user = $this->fetchUser($openId);
 
         $avatarUrl = $user->figureurl_qq_2 ? $user->figureurl_qq_2 : $user->figureurl_2;
 
@@ -271,6 +296,8 @@ class ThirdPartyLoginController extends CommonController
 
     public function weixinCallback()
     {
+        $this->type = 'weixin';
+
         $openId = $this->getWeixinOpenId();
 
         $result = $this->hasOpenId($openId);
@@ -279,8 +306,8 @@ class ThirdPartyLoginController extends CommonController
         }
 
         // 拉取第三方用户信息
-        $weixinUser = $this->fetchWeixinUser($openId);
-        $avatarUrl = $weixinUser->headimgurl;
+        $user = $this->fetchUser($openId);
+        $avatarUrl = $user->headimgurl;
 
         $tmpToken = MultiplexController::temporaryToken();
         $this->storeOpenId($openId, $tmpToken);
