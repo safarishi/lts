@@ -19,6 +19,10 @@ class MultiplexController extends CommonController
 
     protected $curlMethod = 'GET';
 
+    protected $serviceConfig = array();
+
+    protected $accessToken = '';
+
     public static function anonymousUser($ip)
     {
         $area = self::getArea($ip);
@@ -361,26 +365,68 @@ class MultiplexController extends CommonController
 
     public function qqCallback()
     {
-        $config = Config::get('services.qq');
+        if (Input::get('state') !== 'test') {
+            // todo
+            return;
+        }
+
+        $openId  = $this->getQqOpenId();
+
+        $result = $this->hasOpenId($openId);
+        if ($result) {
+            return 'See open id '.$result;
+        }
+
+        $qqUser = $this->fetchQqUser($openId);
+        // json decode
+        $user = json_decode($qqUser);
+
+        $avatarUrl = $user->figureurl_qq_2 ? $user->figureurl_qq_2 : $user->figureurl_2;
+
+        $tmpToken = self::temporaryToken();
+
+        $this->storeOpenId($openId, $tmpToken);
+
+        return 'QueryString ?avatar_url='.$avatarUrl.'&token='.$tmpToken;
+    }
+
+    protected function fetchQqUser($openId)
+    {
+        $this->curlUrl = 'https://graph.qq.com/user/get_user_info?access_token='.
+        $this->accessToken.'&openid='.
+        $openId.'&appid='.$this->serviceConfig['app_id'];
+
+        return $this->curlOperate();
+    }
+
+    /**
+     * 获取 qq 第三方登录的 open id
+     *
+     * @param  string $outcome QueryString
+     * @return string
+     */
+    protected function getQqOpenId()
+    {
+        $this->serviceConfig = Config::get('services.qq');
 
         $this->curlUrl = 'https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id='.
-            $config['app_id'].'&client_secret='.
-            $config['app_key'].'&code='.
+            $this->serviceConfig['app_id'].'&client_secret='.
+            $this->serviceConfig['app_key'].'&code='.
             Input::get('code').'&redirect_uri='.
-            urlencode($config['redirect']);
+            urlencode($this->serviceConfig['redirect']);
 
         $outcome = $this->curlOperate();
 
-        $accessToken = explode('=', explode('&', $outcome)[0])[1];
+        parse_str($outcome, $arr);
 
-        $this->curlUrl = 'https://graph.qq.com/oauth2.0/me?access_token='.$accessToken;
-        $result = $this->curlOperate();
-        var_dump($result);
-        // todo
-        /*
-            string 'callback( {"client_id":"101257109","openid":"292FC6D986316F300806E42DA87EDC75"} );
-' (length=83)
-         */
+        $this->accessToken = $arr['access_token'];
+        $this->curlUrl = 'https://graph.qq.com/oauth2.0/me?access_token='.$this->accessToken;
+        $str = $this->curlOperate();
+        $start = strpos($str, '{');
+        $length = strpos($str, '}') - $start + 1;
+        $jsonStr = substr($str, $start, $length);
+
+        return json_decode($jsonStr)->openid;
     }
 
 }

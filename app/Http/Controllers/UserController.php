@@ -230,6 +230,9 @@ class UserController extends CommonController
     public function modify()
     {
         $uid = $this->authorizer->getResourceOwnerId();
+
+        $this->email = $this->dbRepository('mongodb', 'user')->find($uid)['email'];
+
         $this->prepareModify($uid);
 
         $user = User::find($uid);
@@ -241,6 +244,9 @@ class UserController extends CommonController
             if ($v && $item !== 'avatar_url') {
                 $user->$item = $v;
             }
+            if (Input::has('email')) {
+                $this->updateThirdParty($this->email, Input::get('email'));
+            }
             if (Input::hasFile('avatar_url')) {
                 $user->avatar_url = MultiplexController::uploadAvatar($uid);
             }
@@ -249,6 +255,25 @@ class UserController extends CommonController
         $user->save();
 
         return $this->dbRepository('mongodb', 'user')->find($uid);
+    }
+
+    protected function updateThirdParty($rawEmail, $newEmail)
+    {
+        $exist = $this->dbRepository('mongodb', 'user')
+            ->where('entry.username', $rawEmail)
+            ->first();
+
+        if ($exist === null) {
+            return;
+        }
+
+        $updateData = [
+            'entry.username' => $newEmail,
+        ];
+
+        $this->dbRepository('mongodb', 'user')
+            ->where('entry.username', $rawEmail)
+            ->update($updateData);
     }
 
 }
