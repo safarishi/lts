@@ -22,6 +22,27 @@ class ThirdPartyLoginController extends CommonController
 
     public function weiboCallback()
     {
+        // 获取 open id
+        $openId = $this->getWeiboOpenId();
+
+        $result = $this->hasOpenId($openId);
+        if ($result) {
+            return $result;
+        }
+
+        $weixinUser = $this->fetchWeiboUser($this->accessToken, $openId);
+        $user = json_decode($weixinUser);
+        $avatar_url = $user->avatar_hd ? $user->avatar_hd : $user->avatar_large;
+
+        $tmpToken = MultiplexController::temporaryToken();
+
+        $this->storeOpenId($openId, $tmpToken);
+
+        return 'store success';
+    }
+
+    protected function getWeiboOpenId()
+    {
         $config = Config::get('services.weibo');
 
         $this->curlUrl = 'https://api.weibo.com/oauth2/access_token?client_id='.
@@ -33,23 +54,10 @@ class ThirdPartyLoginController extends CommonController
         $this->curlMethod = 'POST';
 
         $outcome = json_decode($this->curlOperate());
-        // 获取 open id
-        $openId = $outcome->uid;
 
-        $result = $this->hasOpenId($openId);
-        if ($result) {
-            return $result;
-        }
+        $this->accessToken = $outcome->access_token;
 
-        $weixinUser = $this->fetchWeiboUser($outcome->access_token, $openId);
-        $user = json_decode($weixinUser);
-        $avatar_url = $user->avatar_hd ? $user->avatar_hd : $user->avatar_large;
-
-        $tmpToken = MultiplexController::temporaryToken();
-
-        $this->storeOpenId($openId, $tmpToken);
-
-        return 'store success';
+        return $outcome->uid;
     }
 
     protected function fetchWeiboUser($accessToken, $uid)
