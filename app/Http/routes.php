@@ -52,21 +52,21 @@ $api->version('v1', function($api)
     $api->get('generate_token', 'App\Http\Controllers\MultiplexController@generateToken');
     $api->get('generate_captcha', 'App\Http\Controllers\MultiplexController@generateCaptcha');
     // third party login
-    $api->get('weibo_url', 'App\Http\Controllers\MultiplexController@generateWeiboUrl');
-    $api->get('weibo_callback', 'App\Http\Controllers\MultiplexController@weiboCallback');
-    $api->get('qq_url', 'App\Http\Controllers\MultiplexController@generateQqUrl');
-    $api->get('weixin_url', 'App\Http\Controllers\MultiplexController@generateWeixinUrl');
-    $api->get('entry', 'App\Http\Controllers\MultiplexController@entry');
+    $api->get('weibo_url', 'App\Http\Controllers\ThirdPartyLoginController@generateWeiboUrl');
+    $api->get('weibo_callback', 'App\Http\Controllers\ThirdPartyLoginController@weiboCallback');
+    $api->get('qq_url', 'App\Http\Controllers\ThirdPartyLoginController@generateQqUrl');
+    $api->get('weixin_url', 'App\Http\Controllers\ThirdPartyLoginController@generateWeixinUrl');
+    $api->get('entry', 'App\Http\Controllers\ThirdPartyLoginController@entry');
 });
 
 Route::group(array('prefix' => 'v2'), function()
 {
     // route for qq callback
-    Route::get('qq_callback', 'MultiplexController@qqCallback');
+    Route::get('qq_callback', 'ThirdPartyLoginController@qqCallback');
 });
 
 Route::group(array('prefix' => 'v3'), function()
 {
     // route for weinxi callback
-    Route::get('weixin_callback', 'MultiplexController@weixinCallback');
+    Route::get('weixin_callback', 'ThirdPartyLoginController@weixinCallback');
 });
