@@ -15,13 +15,9 @@ class ThirdPartyLoginController extends CommonController
 
     public function generateWeiboUrl()
     {
-        $config = Config::get('services.weibo');
+        $this->type = 'weibo';
 
-        $url = 'https://api.weibo.com/oauth2/authorize?client_id='.
-            $config['client_id'].'&redirect_uri='.
-            urlencode($config['redirect']).'&response_type=code';
-
-        return $url;
+        return $this->generateUrl();
     }
 
     public function weiboCallback()
@@ -29,9 +25,9 @@ class ThirdPartyLoginController extends CommonController
         $config = Config::get('services.weibo');
 
         $this->curlUrl = 'https://api.weibo.com/oauth2/access_token?client_id='.
-            $config['client_id'].'&client_secret='.
-            $config['client_secret'].'&grant_type=authorization_code&redirect_uri='.
-            urlencode($config['redirect']).'&code='.
+            $config['AppId'].'&client_secret='.
+            $config['AppSecret'].'&grant_type=authorization_code&redirect_uri='.
+            urlencode($config['CallbackUrl']).'&code='.
             Input::get('code');
 
         $this->curlMethod = 'POST';
@@ -142,13 +138,9 @@ class ThirdPartyLoginController extends CommonController
 
     public function generateQqUrl()
     {
-        $config = Config::get('services.qq');
+        $this->type = 'qq';
 
-        $url = 'https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id='.
-            $config['app_id'].'&redirect_uri='.
-            urlencode($config['redirect']).'&state=test';
-
-        return $url;
+        return $this->generateUrl();
     }
 
     public function qqCallback()
@@ -188,10 +180,10 @@ class ThirdPartyLoginController extends CommonController
         $this->serviceConfig = Config::get('services.qq');
 
         $this->curlUrl = 'https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id='.
-            $this->serviceConfig['app_id'].'&client_secret='.
-            $this->serviceConfig['app_key'].'&code='.
+            $this->serviceConfig['AppId'].'&client_secret='.
+            $this->serviceConfig['AppSecret'].'&code='.
             Input::get('code').'&redirect_uri='.
-            urlencode($this->serviceConfig['redirect']);
+            urlencode($this->serviceConfig['CallbackUrl']);
 
         $outcome = $this->curlOperate();
 
@@ -211,7 +203,7 @@ class ThirdPartyLoginController extends CommonController
     {
         $this->curlUrl = 'https://graph.qq.com/user/get_user_info?access_token='.
         $this->accessToken.'&openid='.
-        $openId.'&appid='.$this->serviceConfig['app_id'];
+        $openId.'&appid='.$this->serviceConfig['AppId'];
 
         return $this->curlOperate();
     }
@@ -223,12 +215,35 @@ class ThirdPartyLoginController extends CommonController
      */
     public function generateWeixinUrl()
     {
-        $config = Config::get('services.weixin');
+        $this->type = 'weixin';
 
-        $url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='.
-            $config['AppID'].'&redirect_uri='.
-            urlencode($config['CallbackUrl'])
-            .'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect';
+        return $this->generateUrl();
+    }
+
+    protected function generateUrl()
+    {
+        $config = Config::get('services.'.$this->type);
+
+        switch ($this->type) {
+            case 'weibo':
+                $url = 'https://api.weibo.com/oauth2/authorize?client_id='.
+                    $config['AppId'].'&redirect_uri='.
+                    urlencode($config['CallbackUrl']).'&response_type=code';
+                break;
+            case 'qq':
+                $url = 'https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id='.
+                    $config['AppId'].'&redirect_uri='.
+                    urlencode($config['CallbackUrl']).'&state=test';
+                break;
+            case 'weixin':
+                $url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='.
+                    $config['AppId'].'&redirect_uri='.
+                    urlencode($config['CallbackUrl']).'&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect';
+                break;
+            default:
+                # code...
+                break;
+        }
 
         return $url;
     }
@@ -263,7 +278,7 @@ class ThirdPartyLoginController extends CommonController
         $this->serviceConfig = Config::get('services.weixin');
 
         $this->curlUrl = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='
-            .$this->serviceConfig['AppID'].'&secret='
+            .$this->serviceConfig['AppId'].'&secret='
             .$this->serviceConfig['AppSecret'].'&code='
             .$code.'&grant_type=authorization_code';
 
