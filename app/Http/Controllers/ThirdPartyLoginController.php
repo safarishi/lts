@@ -220,6 +220,19 @@ class ThirdPartyLoginController extends CommonController
         return $this->generateUrl();
     }
 
+    /**
+     * 第三授权页面 url
+     *
+     * @param  string $type 第三方类型
+     * @return string
+     */
+    public function redirectUrl($type)
+    {
+        $this->type = $type;
+
+        return $this->generateUrl();
+    }
+
     protected function generateUrl()
     {
         $config = Config::get('services.'.$this->type);

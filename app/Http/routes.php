@@ -51,11 +51,13 @@ $api->version('v1', function($api)
     // generate token
     $api->get('generate_token', 'App\Http\Controllers\MultiplexController@generateToken');
     $api->get('generate_captcha', 'App\Http\Controllers\MultiplexController@generateCaptcha');
-    // third party login
+    // third party login url version 1
     $api->get('weibo_url', 'App\Http\Controllers\ThirdPartyLoginController@generateWeiboUrl');
-    $api->get('weibo_callback', 'App\Http\Controllers\ThirdPartyLoginController@weiboCallback');
     $api->get('qq_url', 'App\Http\Controllers\ThirdPartyLoginController@generateQqUrl');
     $api->get('weixin_url', 'App\Http\Controllers\ThirdPartyLoginController@generateWeixinUrl');
+    // third party login url version 2
+    $api->get('redirect_url/{type}', 'App\Http\Controllers\ThirdPartyLoginController@redirectUrl');
+    $api->get('weibo_callback', 'App\Http\Controllers\ThirdPartyLoginController@weiboCallback');
     $api->get('entry', 'App\Http\Controllers\ThirdPartyLoginController@entry');
 });
 
