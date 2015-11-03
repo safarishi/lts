@@ -24,11 +24,11 @@ class ThirdPartyLoginController extends CommonController
     {
         $this->type = 'weibo';
         // 获取 open id
-        $openId = $this->getWeiboOpenId();
+        $openId = $this->getOpenId();
 
         $result = $this->hasOpenId($openId);
         if ($result) {
-            return $result;
+            return 'See open id '.$result;
         }
 
         $user = $this->fetchUser($openId);
@@ -41,23 +41,39 @@ class ThirdPartyLoginController extends CommonController
         return 'QueryString ?avatar_url='.$avatarUrl.'&token='.$tmpToken;
     }
 
-    protected function getWeiboOpenId()
+    protected function getOpenId()
     {
-        $config = Config::get('services.weibo');
+        $this->serviceConfig = Config::get('services.'.$this->type);
 
-        $this->curlUrl = 'https://api.weibo.com/oauth2/access_token?client_id='.
-            $config['AppId'].'&client_secret='.
-            $config['AppSecret'].'&grant_type=authorization_code&redirect_uri='.
-            urlencode($config['CallbackUrl']).'&code='.
-            Input::get('code');
+        $code = Input::get('code');
 
-        $this->curlMethod = 'POST';
+        switch ($this->type) {
+            case 'weibo':
+                $this->curlUrl = 'https://api.weibo.com/oauth2/access_token?client_id='.
+                    $this->serviceConfig['AppId'].'&client_secret='.
+                    $this->serviceConfig['AppSecret'].'&grant_type=authorization_code&redirect_uri='.
+                    urlencode($this->serviceConfig['CallbackUrl']).'&code='.$code;
+
+                $this->curlMethod = 'POST';
+                break;
+            case 'qq':
+                return $this->getQqOpenId();
+                break;
+            case 'weixin':
+                $this->curlUrl = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='
+                    .$this->serviceConfig['AppId'].'&secret='
+                    .$this->serviceConfig['AppSecret'].'&code='
+                    .$code.'&grant_type=authorization_code';
+                break;
+            default:
+                # code...
+                break;
+        }
 
         $outcome = json_decode($this->curlOperate());
-
         $this->accessToken = $outcome->access_token;
 
-        return $outcome->uid;
+        return ($this->type == 'weibo') ? $outcome->uid : $outcome->openid;
     }
 
     protected function fetchUser($openId)
@@ -170,14 +186,14 @@ class ThirdPartyLoginController extends CommonController
 
     public function qqCallback()
     {
-        $this->type = 'qq';
-
         if (Input::get('state') !== 'test') {
             // todo
             return;
         }
 
-        $openId  = $this->getQqOpenId();
+        $this->type = 'qq';
+
+        $openId  = $this->getOpenId();
 
         $result = $this->hasOpenId($openId);
         if ($result) {
@@ -202,8 +218,6 @@ class ThirdPartyLoginController extends CommonController
      */
     protected function getQqOpenId()
     {
-        $this->serviceConfig = Config::get('services.qq');
-
         $this->curlUrl = 'https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id='.
             $this->serviceConfig['AppId'].'&client_secret='.
             $this->serviceConfig['AppSecret'].'&code='.
@@ -279,9 +293,14 @@ class ThirdPartyLoginController extends CommonController
 
     public function weixinCallback()
     {
+        if (Input::get('state') !== 'STATE') {
+            // todo
+            return;
+        }
+
         $this->type = 'weixin';
 
-        $openId = $this->getWeixinOpenId();
+        $openId = $this->getOpenId();
 
         $result = $this->hasOpenId($openId);
         if ($result) {
@@ -296,28 +315,6 @@ class ThirdPartyLoginController extends CommonController
         $this->storeOpenId($openId, $tmpToken);
 
         return 'QueryString ?avatar_url='.$avatarUrl.'&token='.$tmpToken;
-    }
-
-    protected function getWeixinOpenId()
-    {
-        if (Input::get('state') !== 'STATE') {
-            // todo
-            return;
-        }
-        $code = Input::get('code');
-
-        $this->serviceConfig = Config::get('services.weixin');
-
-        $this->curlUrl = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='
-            .$this->serviceConfig['AppId'].'&secret='
-            .$this->serviceConfig['AppSecret'].'&code='
-            .$code.'&grant_type=authorization_code';
-
-        $outcome = json_decode($this->curlOperate());
-
-        $this->accessToken = $outcome->access_token;
-
-        return $outcome->openid;
     }
 
     /**
