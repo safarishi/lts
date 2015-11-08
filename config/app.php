@@ -152,9 +152,9 @@ return [
 
         Jenssegers\Mongodb\MongodbServiceProvider::class,
 
-        Mews\Captcha\CaptchaServiceProvider::class,
+        // Mews\Captcha\CaptchaServiceProvider::class,
 
-        'Intervention\Image\ImageServiceProvider',
+        // 'Intervention\Image\ImageServiceProvider',
 
     ],
 

@@ -2,10 +2,7 @@
 
 namespace App\Providers;
 
-// use Illuminate\Http\JsonResponse;
 use Illuminate\Support\ServiceProvider;
-// use App\Exceptions\Api\ApiException;
-// use App\Exceptions\Api\ValidationException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,6 +14,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        $this->bootFilters();
+    }
+
+    /**
+     * Boot the filters
+     * @return void
+     */
+    private function bootFilters()
+    {
+        $this->app['router']->filter('validation', 'App\Http\Middleware\ValidationMiddleware');
     }
 
     /**
@@ -27,36 +34,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
-        // $this->registerExceptionHandlers();
     }
 
-    /**
-     * Retister exception handlers
-     *
-     * @return mixed
-     */
-    // private function registerExceptionHandlers()
-    // {
-    //     $this->app->call(function(ApiException $e) {
-    //         return $this->handleException($e);
-    //     });
-    // }
-
-    // private function handleException($exception)
-    // {
-    //     $res = [
-    //         'error' => $exception->errorType,
-    //         'error_description' => $exception->getMessage(),
-    //     ];
-
-    //     if ($code = $exception->getCode()) {
-    //         $res['error_code'] = $code;
-    //     }
-
-    //     if ($uri = $exception->errorUri) {
-    //         $res['error_uri'] = $uri;
-    //     }
-
-    //     return new JsonResponse($res, $exception->httpStatusCode, $exception->getHttpHeaders());
-    // }
 }
