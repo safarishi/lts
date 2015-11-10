@@ -21,7 +21,7 @@ class UserController extends CommonController
     {
         parent::__construct($authorizer);
         $this->middleware('oauth', ['except' => 'store']);
-        $this->middleware('disconnect:mongodb', ['only' => ['modify']]);
+        $this->middleware('disconnect:mongodb', ['only' => ['modify', 'notice', 'removeNotice']]);
         // before middleware
         $this->middleware('oauth.checkClient', ['only' => 'store']);
         // before filter
