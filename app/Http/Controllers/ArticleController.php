@@ -407,9 +407,16 @@ class ArticleController extends CommonController
             ->select('created_at', 'content', 'article', 'user')
             ->find($commentId);
 
+        $user = $comment['user'];
+        $unread = '0';
+        if (array_key_exists('_id', $user)) {
+            $unread = $user['_id']->{'$id'};
+        }
+
         $insertData = array(
                 'source'     => $this->user,
                 'created_at' => date('Y-m-d H:i:s'),
+                'unread'     => $unread,
                 'content'    => array(
                         'reply'   => $this->reply,
                         'comment' => $comment,

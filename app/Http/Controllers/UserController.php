@@ -284,4 +284,26 @@ class UserController extends CommonController
             ->update($updateData);
     }
 
+    public function notice()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $exist = $this->dbRepository('mongodb', 'information')
+            ->where('unread', $uid)
+            ->exists();
+
+        return ['new_information' => $exist];
+    }
+
+    public function removeNotice()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $this->dbRepository('mongodb', 'information')
+            ->where('unread', $uid)
+            ->update(['unread' => '0']);
+
+        return Response::make('', 204);
+    }
+
 }

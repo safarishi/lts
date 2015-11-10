@@ -59,6 +59,10 @@ $api->version('v1', function($api)
     $api->get('redirect_url/{type}', 'App\Http\Controllers\ThirdPartyLoginController@redirectUrl');
     $api->get('weibo_callback', 'App\Http\Controllers\ThirdPartyLoginController@weiboCallback');
     $api->get('entry', 'App\Http\Controllers\ThirdPartyLoginController@entry');
+    // 小红点
+    $api->get('user/notices', 'App\Http\Controllers\UserController@notice');
+    // 点击红点
+    $api->delete('user/notices', 'App\Http\Controllers\UserController@removeNotice');
 });
 
 Route::group(array('prefix' => 'v2'), function()
