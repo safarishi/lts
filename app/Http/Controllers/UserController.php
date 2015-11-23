@@ -24,39 +24,15 @@ class UserController extends CommonController
         $this->middleware('disconnect:mongodb', ['only' => ['modify', 'notice', 'removeNotice']]);
         // before middleware
         $this->middleware('oauth.checkClient', ['only' => 'store']);
-        // before filter
-        // $this->beforeFilter('@storeEmail', ['only' => 'store']);
         $this->middleware('validation');
     }
 
     private static $_validate = [
         'store' => [
-            // 'email' => 'required|email|unique:user',
+            'email' => 'required|email|unique:user',
             'password' => 'required|min:6|confirmed',
         ],
     ];
-
-    /**
-     * 用户注册校验邮箱唯一性
-     *
-     * @throws \App\Exceptions\ValidationException
-     */
-    public function storeEmail()
-    {
-        if (!Input::has('email')) {
-            throw new ValidationException('邮箱不可为空');
-        }
-
-        $this->email = Input::get('email');
-
-        $this->models['user'] = $this->dbRepository('mongodb', 'user');
-
-        $outcome = $this->models['user']->where('email', $this->email)->first();
-
-        if ($outcome) {
-            throw new ValidationException('邮箱已被注册');
-        }
-    }
 
     /**
      * 用户注册
@@ -64,33 +40,28 @@ class UserController extends CommonController
      */
     public function store()
     {
-        // validator
-        $validator = Validator::make(Input::all(), [
-            'email' => 'required|email',
-            'password' => 'required|min:6|confirmed',
-        ]);
-        if ($validator->fails()) {
-            throw new ValidationException($validator->messages()->all());
-        }
-
         $password = Input::get('password');
 
         $avatarUrl = '/uploads/images/avatar/default.png';
 
+        $email = request()->input('email');
+
         $insertData = [
-            'password'   => Hash::make($password),
+            'password'   => bcrypt($password),
             'avatar_url' => $avatarUrl,
-            'email'      => $this->email,
+            'email'      => $email,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
         ];
 
-        $insertId = $this->models['user']->insertGetId($insertData);
+        $user = DB::collection('user');
+
+        $insertId = $user->insertGetId($insertData);
 
         // store the thrid party user info
-        $this->storeThirdPartyUser($this->email, $password);
+        $this->storeThirdPartyUser($email, $password);
 
-        return $this->models['user']->find($insertId);
+        return $user->find($insertId);
     }
 
     /**
