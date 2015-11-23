@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function bootFilters()
     {
-        $this->app['router']->filter('validation', 'App\Http\Middleware\ValidationMiddleware');
+        $this->app['router']->middleware('validation', 'App\Http\Middleware\ValidationMiddleware');
     }
 
     /**

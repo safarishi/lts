@@ -26,7 +26,7 @@ class UserController extends CommonController
         $this->middleware('oauth.checkClient', ['only' => 'store']);
         // before filter
         // $this->beforeFilter('@storeEmail', ['only' => 'store']);
-        $this->beforeFilter('validation');
+        $this->middleware('validation');
     }
 
     private static $_validate = [

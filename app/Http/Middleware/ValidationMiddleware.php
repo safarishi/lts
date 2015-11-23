@@ -42,6 +42,13 @@ class ValidationMiddleware
       $this->validator = $validator;
     }
 
+    public function handle($request, Closure $next)
+    {
+        $this->filter(\Route::getCurrentRoute(), $request);
+
+        return $next($request);
+    }
+
     /**
      * Run the validation filter
      *
