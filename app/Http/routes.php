@@ -13,6 +13,7 @@
 
 Route::get('/', function()
 {
+    return 'lts';
     return view('welcome');
 });
 

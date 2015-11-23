@@ -14,7 +14,7 @@ class OauthCheckClient
         $clientId     = Input::get('client_id');
         $clientSecret = Input::get('client_secret');
 
-        $client = DB::table('oauth_clients')
+        $client = DB::connection('mysql')->table('oauth_clients')
                 ->where('id', $clientId)
                 ->where('secret', $clientSecret)
                 ->get();
