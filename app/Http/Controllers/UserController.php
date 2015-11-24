@@ -40,11 +40,11 @@ class UserController extends CommonController
      */
     public function store()
     {
-        $password = Input::get('password');
+        $password = request('password');
 
         $avatarUrl = '/uploads/images/avatar/default.png';
 
-        $email = request()->input('email');
+        $email = request('email');
 
         $insertData = [
             'password'   => bcrypt($password),
