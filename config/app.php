@@ -152,6 +152,8 @@ return [
 
         Jenssegers\Mongodb\MongodbServiceProvider::class,
 
+        Illuminate\Html\HtmlServiceProvider::class,
+
         // Mews\Captcha\CaptchaServiceProvider::class,
 
         // 'Intervention\Image\ImageServiceProvider',
@@ -210,6 +212,8 @@ return [
         'Captcha' => Mews\Captcha\Facades\Captcha::class,
 
         'Image' => 'Intervention\Image\Facades\Image',
+
+        'Form'      => Illuminate\Html\FormFacade::class,
 
     ],
 

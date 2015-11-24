@@ -13,9 +13,51 @@
 
 Route::get('/', function()
 {
+    return View::make('oauth.authorization-form', ['params' => 'cc', 'client' => 'client']);
+    // return View::make('oauth.authorization-form', ['params' => 'aa']);
     return 'lts';
     return view('welcome');
 });
+
+// Route::get('oauth/authorize', ['as' => 'oauth.authorize.get','middleware' => ['check-authorization-params', 'auth'], function() {
+Route::get('oauth/authorize', ['as' => 'oauth.authorize.get','middleware' => ['check-authorization-params'], function() {
+// Route::get('oauth/authorize', function() {
+    // display a form where the user can authorize the client to access it's data
+   $authParams = Authorizer::getAuthCodeRequestParams();
+   // var_dump($authParams);exit;
+   $formParams = array_except($authParams,'client');
+   $formParams['client_id'] = $authParams['client']->getId();
+   return View::make('oauth.authorization-form', ['params'=>$formParams,'client'=>$authParams['client']]);
+}]);
+
+// Route::post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['csrf', 'check-authorization-params', 'auth'], function() {
+// Route::post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['csrf', 'check-authorization-params'], function() {
+Route::post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['check-authorization-params'], function() {
+
+    $params = Authorizer::getAuthCodeRequestParams();
+    var_dump($params);exit;
+    $params['user_id'] = Auth::user()->id;
+    $redirectUri = '';
+
+    // if the user has allowed the client to access its data, redirect back to the client with an auth code
+    if (Input::get('approve') !== null) {
+        $redirectUri = Authorizer::issueAuthCode('user', $params['user_id'], $params);
+    }
+
+    // if the user has denied the client to access its data, redirect back to the client with an error message
+    if (Input::get('deny') !== null) {
+        $redirectUri = Authorizer::authCodeRequestDeniedRedirectUri();
+    }
+    return Redirect::to($redirectUri);
+}]);
+
+Route::post('oauth/access_token', function() {
+    return Response::json(Authorizer::issueAccessToken());
+});
+
+Route::get('auth/login', 'MultiplexController@authLogin');
+
+Route::get('redirect_url', 'MultiplexController@redirectUrl');
 
 $api = app('Dingo\Api\Routing\Router');
 

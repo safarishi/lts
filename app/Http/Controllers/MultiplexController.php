@@ -214,4 +214,14 @@ class MultiplexController extends CommonController
         return $token;
     }
 
+    public function redirectUrl()
+    {
+        echo 'redirect url';
+    }
+
+    public function authLogin()
+    {
+        echo 'auth login';
+    }
+
 }
