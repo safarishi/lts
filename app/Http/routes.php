@@ -13,26 +13,21 @@
 
 Route::get('/', function()
 {
-    return View::make('oauth.authorization-form', ['params' => 'cc', 'client' => 'client']);
-    // return View::make('oauth.authorization-form', ['params' => 'aa']);
     return 'lts';
     return view('welcome');
 });
 
-// Route::get('oauth/authorize', ['as' => 'oauth.authorize.get','middleware' => ['check-authorization-params', 'auth'], function() {
-Route::get('oauth/authorize', ['as' => 'oauth.authorize.get','middleware' => ['check-authorization-params'], function() {
-// Route::get('oauth/authorize', function() {
+// middleware auth todo
+// 可能需要去掉
+Route::get('oauth/authorize', ['as' => 'oauth.authorize.get','middleware' => ['check-authorization-params', 'auth'], function() {
     // display a form where the user can authorize the client to access it's data
-   $authParams = Authorizer::getAuthCodeRequestParams();
-   // var_dump($authParams);exit;
-   $formParams = array_except($authParams,'client');
-   $formParams['client_id'] = $authParams['client']->getId();
-   return View::make('oauth.authorization-form', ['params'=>$formParams,'client'=>$authParams['client']]);
+    $authParams = Authorizer::getAuthCodeRequestParams();
+    $formParams = array_except($authParams,'client');
+    $formParams['client_id'] = $authParams['client']->getId();
+    return View::make('oauth.authorization-form', ['params'=>$formParams,'client'=>$authParams['client']]);
 }]);
 
-// Route::post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['csrf', 'check-authorization-params', 'auth'], function() {
-// Route::post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['csrf', 'check-authorization-params'], function() {
-Route::post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['check-authorization-params'], function() {
+Route::post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['csrf', 'check-authorization-params', 'auth'], function() {
 
     $params = Authorizer::getAuthCodeRequestParams();
     var_dump($params);exit;
