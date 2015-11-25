@@ -30,8 +30,10 @@ Route::get('oauth/authorize', ['as' => 'oauth.authorize.get','middleware' => ['c
 Route::post('oauth/authorize', ['as' => 'oauth.authorize.post','middleware' => ['csrf', 'check-authorization-params', 'auth'], function() {
 
     $params = Authorizer::getAuthCodeRequestParams();
-    var_dump($params);exit;
+    // add extra
+    Auth::attempt(['email' => Input::get('email'), 'password' => Input::get('password')]);
     $params['user_id'] = Auth::user()->id;
+
     $redirectUri = '';
 
     // if the user has allowed the client to access its data, redirect back to the client with an auth code
