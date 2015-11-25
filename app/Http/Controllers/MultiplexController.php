@@ -216,7 +216,7 @@ class MultiplexController extends CommonController
 
     public function redirectUrl()
     {
-        echo 'redirect url';
+        echo 'redirect url test with oauth2 grant type for authorization code';
     }
 
     public function authLogin()

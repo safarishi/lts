@@ -5,6 +5,8 @@
         <dd>{{$client->getName()}}</dd>
     </dl>
 </div>
+{!! Form::text('email') !!}
+{!! Form::text('password') !!}
 {!! Form::hidden('client_id', $params['client_id']) !!}
 {!! Form::hidden('redirect_uri', $params['redirect_uri']) !!}
 {!! Form::hidden('response_type', $params['response_type']) !!}
