@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions\Api;
+namespace App\Exceptions;
 
 use Symfony\Component\HttpFoundation\Request;
 
