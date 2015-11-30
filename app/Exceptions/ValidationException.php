@@ -2,15 +2,12 @@
 
 namespace App\Exceptions;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
-class ValidationException extends HttpException
+class ValidationException extends ApiException
 {
     public function __construct($msg)
     {
-        if (is_array($msg)) {
-            $msg = implode($msg, ' ');
-        }
-        parent::__construct(400, $msg);
+        parent::__construct($msg, 14001);
+        $this->httpStatusCode = 400;
+        $this->errorType = 'invalid_request';
     }
 }

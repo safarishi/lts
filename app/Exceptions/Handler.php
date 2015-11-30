@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -42,10 +43,32 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
+        if ($e instanceof ApiException) {
+            return $this->customHandle($e);
+        }
+
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         }
 
         return parent::render($request, $e);
     }
+
+    protected function customHandle($e)
+    {
+        $res = [
+            'error' => $e->errorType,
+            'error_description' => $e->getMessage()
+        ];
+
+        if ($code = $e->getCode()) {
+            $res['error_code'] = $code;
+        }
+        if ($uri = $e->errorUri) {
+            $res['error_uri'] = $uri;
+        }
+
+        return new JsonResponse($res, $e->httpStatusCode, $e->getHttpHeaders());
+    }
+
 }
