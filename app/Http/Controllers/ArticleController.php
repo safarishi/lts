@@ -24,13 +24,17 @@ class ArticleController extends CommonController
         $this->middleware('disconnect:sqlsrv2', ['only' => ['product']]);
         $this->middleware('disconnect:mongodb', ['only' => ['favour', 'show', 'commentList', 'myComment', 'myStar', 'myInformation']]);
         $this->middleware('oauth', ['except' => ['index', 'show', 'report', 'anonymousComment', 'anonymousReply', 'commentList', 'search', 'moreArticle', 'product', 'team']]);
-        $this->middleware('validation.required:content', ['only' => ['anonymousComment', 'anonymousReply', 'comment', 'reply']]);
-        // $this->beforeFilter('validation');
+        $this->middleware('validation');
     }
 
-    // private static $_validate = [
-        //
-    // ];
+    private static $_validate = [
+        'comment' => [
+            'content' => 'required',
+        ],
+        'anonymousComment' => [
+            'content' => 'required',
+        ],
+    ];
 
     public function index()
     {
