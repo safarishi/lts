@@ -234,7 +234,11 @@ class ArticleController extends CommonController
 
     protected function checkUserArticleStar($id)
     {
-        $uid = $this->getUid();
+        if (!$this->accessToken) {
+            return false;
+        }
+
+        $uid = $this->getOwnerId();
 
         return $this->checkUserStar($uid, $id);
     }
