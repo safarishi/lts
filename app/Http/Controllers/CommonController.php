@@ -62,24 +62,29 @@ class CommonController extends ApiController
     }
 
     /**
-     * 获取用户id
+     * 获取用户 ID
      * 用户未登录返回空字符串 ''
-     * 登录用户返回用户id
+     * 登录用户返回用户 ID
      *
      * @return string
      */
     protected function getUid()
     {
-        $uid = '';
-
-        if ($this->accessToken) {
-            // 获取用户id
-            $this->authorizer->validateAccessToken();
-            $uid = $this->authorizer->getResourceOwnerId();
-        }
-
-        return $uid;
+        return (!$this->accessToken) ? '' : ($this->getOwnerId());
     }
+
+    /**
+     * 根据 Access Token 获取用户 ID
+     *
+     * @return string
+     */
+    protected function getOwnerId()
+    {
+        $this->authorizer->validateAccessToken();
+
+        return $this->authorizer->getResourceOwnerId();
+    }
+
 
     /**
      * 检查用户是否收藏文章
