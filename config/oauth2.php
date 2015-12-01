@@ -43,7 +43,7 @@ return [
         'password' => [
             'class' => '\League\OAuth2\Server\Grant\PasswordGrant',
             'callback' => '\App\PasswordVerifier@verify',
-            'access_token_ttl' => 3600
+            'access_token_ttl' => 7200
         ],
         'refresh_token' => [
             'class' => '\League\OAuth2\Server\Grant\RefreshTokenGrant',
