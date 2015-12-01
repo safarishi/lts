@@ -75,10 +75,10 @@ $api->version('v1', ['namespace' => 'App\Http\Controllers'], function ($api) {
     $api->post('oauth/access_token', 'OAuthController@postAccessToken');
     // 退出登录
     $api->delete('oauth/invalidate_token', 'UserController@logout');
-    $api->post('articles/{id}/comments/{comment_id}/replies', 'ArticleController@reply');
-    $api->post('articles/{id}/comments/{comment_id}/anonymous_replies', 'ArticleController@anonymousReply');
-    $api->put('articles/{id}/comments/{comment_id}/favours', 'ArticleController@favour');
-    $api->delete('articles/{id}/comments/{comment_id}/favours', 'ArticleController@unfavour');
+    $api->post('articles/{id}/comments/{comment_id}/replies', 'CommentController@reply');
+    $api->post('articles/{id}/comments/{comment_id}/anonymous_replies', 'CommentController@anonymousReply');
+    $api->put('articles/{id}/comments/{comment_id}/favours', 'CommentController@favour');
+    $api->delete('articles/{id}/comments/{comment_id}/favours', 'CommentController@unfavour');
     $api->get('articles/{id}/comments', 'ArticleController@commentList');
     $api->get('search/articles', 'ArticleController@search');
     $api->get('more_articles/{column_id}', 'ArticleController@moreArticle');
