@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Routing\Controller;
 use LucaDegasperi\OAuth2Server\Authorizer;
 
-class OauthController extends ApiController
+class OAuthController extends ApiController
 {
     protected $authorizer;
 

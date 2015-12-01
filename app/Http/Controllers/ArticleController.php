@@ -169,7 +169,7 @@ class ArticleController extends CommonController
             ->first();
 
         if ($article === null) {
-            throw new ValidationException('Article id parameter is wrong.');
+            throw new ValidationException('参数传递错误:(');
         }
 
         $tmp = clone $article;

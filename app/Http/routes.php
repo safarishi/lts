@@ -72,7 +72,7 @@ $api->version('v1', ['namespace' => 'App\Http\Controllers'], function ($api) {
     // 用户注册
     $api->post('users', 'UserController@store');
     // 用户登录
-    $api->post('oauth/access_token', 'OauthController@postAccessToken');
+    $api->post('oauth/access_token', 'OAuthController@postAccessToken');
     // 退出登录
     $api->delete('oauth/invalidate_token', 'UserController@logout');
     $api->post('articles/{id}/comments/{comment_id}/replies', 'ArticleController@reply');
