@@ -189,6 +189,9 @@ class UserController extends CommonController
         $validator = Validator::make(Input::all(), [
             // mongodb 强制唯一规则忽略指定的 ID
             'email'  => 'email|unique:user,email,'.$uid.',_id',
+            // mongodb: config database.php connections.mongodb
+            // _id: 指定的 ID (指定主键) 名称
+            // 'email'  => 'email|unique:mongodb.user,email,'.$uid.',_id',
             'gender' => 'in:男,女',
         ]);
         if ($validator->fails()) {
