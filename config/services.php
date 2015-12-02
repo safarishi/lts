@@ -36,14 +36,14 @@ return [
     ],
 
     'weibo' => [
-        'AppId'     => env('WEIBO_KEY'),
-        'AppSecret' => env('WEIBO_SECRET'),
-        'CallbackUrl'      => env('WEIBO_REDIRECT_URI'),
+        'AppId'       => env('WEIBO_KEY'),
+        'AppSecret'   => env('WEIBO_SECRET'),
+        'CallbackUrl' => env('WEIBO_REDIRECT_URI'),
     ],
 
     'qq' => [
-        'AppId'   => env('APP_ID'),
-        'AppSecret'  => env('APP_SECRET'),
+        'AppId'       => env('APP_ID'),
+        'AppSecret'   => env('APP_SECRET'),
         'CallbackUrl' => env('REDIRECT'),
     ],
 
