@@ -88,6 +88,8 @@ $api->version('v1', ['namespace' => 'App\Http\Controllers'], function ($api) {
     $api->get('user/informations', 'UserController@myInformation');
     // 修改用户个人信息
     $api->post('user', 'UserController@modify');
+    // 修改用户的登录密码
+    $api->put('user/password', 'UserPasswordController@modify');
     $api->get('products', 'ArticleController@product');
     $api->get('teams', 'ArticleController@team');
     // generate token
