@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Auth;
 use Hash;
 use Input;
@@ -46,10 +47,23 @@ class UserPasswordController extends CommonController
             ->update($updateData);
         if ($item === 1) {
             // 如果是第三方用户的话，修改第三方用户的登录密码
-            // $this->updateThirdPartyUserPassword($email, $newPassword);
+            $this->updateThirdPartyUserPassword($email, $newPassword);
         }
 
         return $this->dbRepository('mongodb', 'user')->find($uid);
+    }
+
+    /**
+     * 更新第三方用户绑定的登录密码
+     *
+     * @param  string $username 第三方登录名
+     * @param  string $password 第三方登录密码
+     * @return void
+     */
+    protected function updateThirdPartyUserPassword($username, $password)
+    {
+        DB::collection('user')->where('entry.username', $username)
+            ->update(['entry.password' => $password]);
     }
 
     /**

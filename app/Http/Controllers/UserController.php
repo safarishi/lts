@@ -41,7 +41,7 @@ class UserController extends CommonController
     {
         $password = request('password');
 
-        $avatarUrl = '/uploads/images/avatar/default.png';
+        $avatarUrl = $this->getAvatarUrl();
 
         $email = request('email');
 
@@ -61,6 +61,23 @@ class UserController extends CommonController
         $this->storeThirdPartyUser($email, $password);
 
         return $user->find($insertId);
+    }
+
+    protected function getAvatarUrl()
+    {
+        $avatarUrl = '/uploads/images/avatar/default.png';
+
+        if (!Input::has('avatar_url')) {
+            return $avatarUrl;
+        }
+
+        $avatar_url = Input::get('avatar_url');
+
+        if (preg_match('#^http(s)?://#', $avatar_url) === 1) {
+            $avatarUrl = $avatar_url;
+        }
+
+        return $avatarUrl;
     }
 
     /**
@@ -88,9 +105,7 @@ class UserController extends CommonController
                     'password' => $password,
                 )
         ];
-
-        DB::connection('mongodb')->collection('user')
-            ->where('addition.token', $token)
+        DB::collection('user')->where('addition.token', $token)
             ->update($updateData);
     }
 
