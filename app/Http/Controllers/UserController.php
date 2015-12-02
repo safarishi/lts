@@ -184,7 +184,6 @@ class UserController extends CommonController
         }
     }
 
-    /**
      * 修改用户信息前的校验
      *
      * @param  string $uid 用户id
@@ -192,9 +191,9 @@ class UserController extends CommonController
      */
     protected function prepareModify($uid)
     {
-        // validator
         $validator = Validator::make(Input::all(), [
-            'email'  => 'email',
+            // mongodb 强制唯一规则忽略指定的 ID
+            'email'  => 'email|unique:user,email,'.$uid.',_id',
             'gender' => 'in:男,女',
         ]);
         if ($validator->fails()) {
