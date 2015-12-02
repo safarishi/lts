@@ -186,7 +186,7 @@ class UserController extends CommonController
     {
         $uid = $this->authorizer->getResourceOwnerId();
 
-        $this->email = $this->dbRepository('mongodb', 'user')->find($uid)['email'];
+        $this->email = $this->dbRepository('mongodb', 'user')->where('_id', $uid)->pluck('email');
 
         $this->prepareModify($uid);
 
@@ -194,15 +194,15 @@ class UserController extends CommonController
 
         $allowedFields = ['avatar_url', 'display_name', 'gender', 'email', 'company'];
 
-        array_walk($allowedFields, function($item) use ($user, $uid) {
+        array_walk($allowedFields, function ($item) use ($user, $uid) {
             $v = Input::get($item);
             if ($v && $item !== 'avatar_url') {
                 $user->$item = $v;
             }
-            if (Input::has('email')) {
+            if ($item === 'email' && Input::has('email')) {
                 $this->updateThirdParty($this->email, Input::get('email'));
             }
-            if (Input::hasFile('avatar_url')) {
+            if ($item === 'avatar_url' && Input::hasFile('avatar_url')) {
                 $user->avatar_url = MultiplexController::uploadAvatar($uid);
             }
         });
