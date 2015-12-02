@@ -165,25 +165,6 @@ class UserController extends CommonController
     }
 
     /**
-     * 修改用户信息的时候校验邮箱唯一性
-     *
-     * @param  string $uid 用户id
-     * @return void
-     *
-     * @throws \App\Exceptions\ValidationException
-     */
-    protected function validateEmail($uid)
-    {
-        $outcome = $this->dbRepository('mongodb', 'user')
-            ->where('_id', '<>', $uid)
-            ->where('email', Input::get('email'))
-            ->first();
-
-        if ($outcome) {
-            throw new ValidationException('邮箱已被占用');
-        }
-    }
-
      * 修改用户信息前的校验
      *
      * @param  string $uid 用户id
@@ -198,10 +179,6 @@ class UserController extends CommonController
         ]);
         if ($validator->fails()) {
             throw new ValidationException($validator->messages()->all());
-        }
-
-        if (Input::has('email')) {
-            $this->validateEmail($uid);
         }
     }
 
