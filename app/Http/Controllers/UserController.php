@@ -22,7 +22,6 @@ class UserController extends CommonController
         parent::__construct($authorizer);
         $this->middleware('oauth', ['except' => 'store']);
         $this->middleware('disconnect:mongodb', ['only' => ['modify', 'notice', 'removeNotice']]);
-        // before middleware
         $this->middleware('oauth.checkClient', ['only' => 'store']);
         $this->middleware('validation');
     }
@@ -186,7 +185,9 @@ class UserController extends CommonController
     {
         $uid = $this->authorizer->getResourceOwnerId();
 
-        $this->email = $this->dbRepository('mongodb', 'user')->where('_id', $uid)->pluck('email');
+        $this->email = $this->dbRepository('mongodb', 'user')
+            ->where('_id', $uid)
+            ->pluck('email');
 
         $this->prepareModify($uid);
 
@@ -203,7 +204,8 @@ class UserController extends CommonController
                 $this->updateThirdParty($this->email, Input::get('email'));
             }
             if ($item === 'avatar_url' && Input::hasFile('avatar_url')) {
-                $user->avatar_url = MultiplexController::uploadAvatar($uid);
+                // todo
+                // $user->avatar_url = MultiplexController::uploadAvatar($uid);
             }
         });
 

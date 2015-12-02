@@ -11,22 +11,18 @@ class ApiController extends Controller
 
     protected $accessToken;
 
-    public function __construct(Authorizer $authorizer = null)
+    public function __construct(Authorizer $authorizer)
     {
         $this->authorizer = $authorizer;
 
         try {
-            $this->accessToken = $authorizer->getChecker()->determineAccessToken();
+            $this->accessToken = $authorizer->getChecker()
+                ->determineAccessToken();
             if ($this->accessToken) {
                 $this->middleware('oauth');
             }
         } catch (InvalidRequestException $e) {
             // do nothing
         }
-
     }
-
-    // public function index() {
-    //   return Input::all();
-    // }
 }
