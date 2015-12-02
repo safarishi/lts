@@ -20,7 +20,7 @@ class OauthCheckClient
                 ->get();
 
         if (empty($client)) {
-            throw new UnauthorizedClientException('Unauthorized client.');
+            throw new UnauthorizedClientException('未授权的客户端');
         }
 
         return $next($request);
