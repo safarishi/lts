@@ -121,6 +121,15 @@ class MultiplexController extends CommonController
     }
 
     /**
+     * 生成临时 token
+     * @return string
+     */
+    public static function uuid()
+    {
+        return self::temporaryToken();
+    }
+
+    /**
      * 随机生成默认长度6位由字母、数字组成的字符串
      *
      * @param  integer $length
