@@ -7,6 +7,7 @@ use Auth;
 use Hash;
 use Mail;
 use Input;
+use App\Exceptions\ValidationException;
 use LucaDegasperi\OAuth2Server\Authorizer;
 use League\OAuth2\Server\Exception\InvalidCredentialsException;
 
@@ -15,7 +16,7 @@ class UserPasswordController extends CommonController
     public function __construct(Authorizer $authorizer)
     {
         parent::__construct($authorizer);
-        $this->middleware('oauth', ['except' => ['sendEmail']]);
+        $this->middleware('oauth', ['except' => ['sendEmail', 'reset']]);
         $this->middleware('validation');
     }
 
@@ -26,6 +27,9 @@ class UserPasswordController extends CommonController
         ],
         'sendEmail' => [
             'email' => 'required|email|exists:user',
+        ],
+        'reset' => [
+            'password' => 'required|min:6|confirmed',
         ],
     ];
 
@@ -131,6 +135,117 @@ class UserPasswordController extends CommonController
     protected function getDisplayName($user)
     {
         return isset($user['display_name']) ? $user['display_name'] : '用户';
+    }
+
+    public function reset()
+    {
+        if (!Input::has('confirmation')) {
+            throw new ValidationException('参数错误');
+        }
+        // 移除过期数据
+        $this->removeExpiredData();
+
+        $confirmation = request('confirmation');
+
+        $passwordEmail = $this->dbRepository('mongodb', 'password_email')
+            ->where('confirmed_code', $confirmation)
+            ->first();
+
+        if ($passwordEmail === null) {
+            throw new ValidationException('链接或已失效，请重新找回密码！');
+        }
+        // 判断链接是否失效
+        if (time() > strtotime($passwordEmail['expired_at'])) {
+            throw new ValidationException('重置密码链接已失效，请重新找回密码！');
+        }
+
+        $this->uid = $passwordEmail['user_id'];
+        // 密码重置处理
+        $this->resetProcess($confirmation);
+    }
+
+    /**
+     * 移除数据库中过期的数据
+     *
+     * @return void
+     */
+    protected function removeExpiredData()
+    {
+        $this->dbRepository('mongodb', 'password_email')
+            ->where('expired_at', '<', date('Y-m-d H:i:s'))
+            ->delete();
+    }
+
+    /**
+     * 密码重置处理程序
+     *
+     * @param  string $confirmation 校验码
+     * @return void
+     */
+    protected function resetProcess($confirmation)
+    {
+        // 检查是否为上次密码
+        $this->checkIsLastPassword();
+        // 重置密码
+        $this->resetPassword();
+        // 密码重置成功，移除密码重置链接对应的数据
+        $this->removeData($confirmation);
+    }
+
+    /**
+     * 检查密码是否为上次的密码
+     *
+     * @return void
+     *
+     * @throws \App\Exceptions\ValidationException
+     */
+    protected function checkIslastpassword()
+    {
+        $user = DB::collection('user')->find($this->uid);
+
+        if ($user === null) {
+            return;
+        }
+
+        $this->password = request('password');
+
+        $credentials = [
+            'email'    => $user['email'],
+            'password' => $this->password,
+        ];
+
+        if (Auth::once($credentials)) {
+            throw new ValidationException('不能和上次密码相同:)');
+        }
+    }
+
+    /**
+     * 重置密码
+     *
+     * @return void
+     */
+    protected function resetPassword()
+    {
+        $updateData = [
+            'password'   => bcrypt($this->password),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        $user = DB::collection('user')->where('_id', $this->uid)
+            ->update($updateData);
+
+    }
+
+    /**
+     * 移除密码重置链接对应的数据
+     *
+     * @param  string $confirmation 校验码
+     * @return void
+     */
+    public function removeData($confirmation)
+    {
+        DB::collection('password_email')
+            ->where('confirmed_code', $confirmation)
+            ->delete();
     }
 
 }
