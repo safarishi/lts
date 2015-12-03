@@ -63,7 +63,8 @@ $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', ['namespace' => 'App\Http\Controllers'], function ($api) {
     // app route list
     $api->get('articles', 'ArticleController@index');
-    $api->get('articles/{id}', 'ArticleController@show');
+    $api->get('articles/{id}', 'ArticleController@show')
+        ->where('id', '[1-9][0-9]*');
     $api->get('reports', 'ArticleController@report');
     $api->put('articles/{id}/stars', 'ArticleController@star');
     $api->delete('articles/{id}/stars', 'ArticleController@unstar');
