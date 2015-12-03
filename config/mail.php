@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'from' => ['address' => null, 'name' => null],
+    'from' => ['address' => 'sshsfl@yeah.net', 'name' => 'SAFARI_SHI'],
 
     /*
     |--------------------------------------------------------------------------

@@ -91,6 +91,8 @@ $api->version('v1', ['namespace' => 'App\Http\Controllers'], function ($api) {
     $api->post('user', 'UserController@modify');
     // 修改用户的登录密码
     $api->put('user/password', 'UserPasswordController@modify');
+    // 发送验证邮件
+    $api->post('send/emails', 'UserPasswordController@sendEmail');
     $api->get('products', 'ArticleController@product');
     $api->get('teams', 'ArticleController@team');
     // generate token
