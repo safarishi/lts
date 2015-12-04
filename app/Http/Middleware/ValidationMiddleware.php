@@ -35,11 +35,12 @@ class ValidationMiddleware
 
     /**
      * validator constuct
+     *
      * @param Validator $validator Validator
      */
     public function __construct(Validator $validator)
     {
-      $this->validator = $validator;
+        $this->validator = $validator;
     }
 
     public function handle($request, Closure $next)
@@ -52,58 +53,66 @@ class ValidationMiddleware
     /**
      * Run the validation filter
      *
-     * @internal param mixed $route, mixed $request
-     * @return $response
+     * @internal
+     * @param mixed $route
+     * @param mixed $request
+     * @return
      */
     public function filter($route, $request)
     {
-      $str = $route->getAction()['uses'];
-      $pos = strrpos($str, '\\');
-      // $routeParam = explode('@', $route->getActionName());
-      $routeParam = explode('@', substr($str, $pos + 1));
-      $this->controllerName = $routeParam[0];
-      $this->actionName = $routeParam[1];
-      $this->setControllerRule();
-      // get and check the validation rules used in this request
-      if (!$rules = $this->getRules()) {
-        return;
-      }
+        $str = $route->getAction()['uses'];
+        $pos = strrpos($str, '\\');
+        // $routeParam = explode('@', $route->getActionName());
+        $routeParam = explode('@', substr($str, $pos + 1));
+        $this->controllerName = $routeParam[0];
+        $this->actionName = $routeParam[1];
+        $this->setControllerRule();
+        // get and check the validation rules used in this request
+        if (!$rules = $this->getRules()) {
+            return;
+        }
 
-      $validator = $this->validator->make($request->all(), $rules);
-      if ($validator->fails()) {
-        $messages = $validator->messages()->all();
-        throw new ValidationException($messages);
-      }
+        $validator = $this->validator->make($request->all(), $rules);
+        if ($validator->fails()) {
+            $messages = $validator->messages()->all();
+
+            throw new ValidationException($messages);
+        }
     }
 
     private function setControllerRule()
     {
-      $this->controllerName = '\App\Http\Controllers\\'.$this->controllerName;
-      // check controller is exists
-      if (!class_exists($this->controllerName)) {
-        return;
-      }
-      // use reflection class to get the property value
-      $controllerRlection = new \ReflectionClass($this->controllerName);
-      if (!$controllerRlection->hasProperty($this->propertyName)) {
-        return;
-      }
-      $prop = $controllerRlection->getProperty($this->propertyName);
-      $prop->setAccessible(true);
-      $controllerRules = $prop->getValue();
-      if (!array_key_exists($this->actionName, $controllerRules)) {
-        return;
-      }
-      $this->rules[$this->controllerName] = $controllerRules;
+        $this->controllerName = '\App\Http\Controllers\\'.$this->controllerName;
+
+        // check controller is exists
+        if (!class_exists($this->controllerName)) {
+            return;
+        }
+        // use reflection class to get the property value
+        $controllerRlection = new \ReflectionClass($this->controllerName);
+        if (!$controllerRlection->hasProperty($this->propertyName)) {
+            return;
+        }
+
+        $prop = $controllerRlection->getProperty($this->propertyName);
+        $prop->setAccessible(true);
+        $controllerRules = $prop->getValue();
+
+        if (!array_key_exists($this->actionName, $controllerRules)) {
+            return;
+        }
+
+        $this->rules[$this->controllerName] = $controllerRules;
     }
 
     /**
      * get needed rules
-     * @return mixed              validator rules
+     *
+     * @return mixed validator rules
      */
     private function getRules()
     {
-      return !empty($this->rules) ?
-        $this->rules[$this->controllerName][$this->actionName] : null;
+        return !empty($this->rules) ?
+            $this->rules[$this->controllerName][$this->actionName] : null;
     }
 }
