@@ -191,7 +191,7 @@ class UserPasswordController extends CommonController
         $this->checkIsLastPassword();
         // 重置密码
         $this->resetPassword();
-        // 重置成功，移除密码重置链接对应的数据
+        // 移除密码重置链接对应的字段数据
         $this->removeData($confirmation);
     }
 
@@ -234,7 +234,7 @@ class UserPasswordController extends CommonController
     }
 
     /**
-     * 移除密码重置连接对应的数据
+     * 移除密码重置链接对应的字段数据
      * unset
      *
      * @param  string $confirmation 确认码
