@@ -98,31 +98,30 @@ class UserPasswordController extends CommonController
     public function sendEmail()
     {
         MultiplexController::verifyCaptcha();
+
         $email = request('email');
 
-        $user = $this->dbRepository('mongodb', 'user')
+        $this->models['user'] = DB::collection('user');
+
+        $user = $this->models['user']
             ->where('email', $email)
             ->first();
 
         $displayName   = $this->getDisplayName($user);
         $confirmedCode = MultiplexController::uuid();
-        $insertData    = [
-            'user_id'        => $user['_id'],
-            'confirmed_code' => $confirmedCode,
-            'created_at'     => date('Y-m-d H:i:s'),
-            'expired_at'     => date('Y-m-d H:i:s', time() + 12*60*60),
-            'updated_at'     => date('Y-m-d H:i:s'),
+        $updateData = [
+            'password_email' => [
+                'confirmed_code' => $confirmedCode,
+                'expired_at'     => date('Y-m-d H:i:s', time() + 12*60*60),
+            ],
         ];
-        $this->dbRepository('mongodb', 'password_email')
-            ->where('email', $email)
-            ->insert($insertData);
+        $this->models['user']->update($updateData);
         // 传递到邮件内容模板的视图变量
-        $mailData = [
+        $emailData = [
             'display_name' => $displayName,
-            'confirmed' => $confirmedCode,
+            'confirmed'    => $confirmedCode,
         ];
-
-        Mail::send('email.view', $mailData, function ($message) use ($email) {
+        Mail::send('email.view', $emailData, function ($message) use ($email) {
             $message->to($email)->subject('重设密码');
         });
     }
