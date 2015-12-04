@@ -184,6 +184,7 @@ class UserPasswordController extends CommonController
      */
     protected function resetProcess($confirmation)
     {
+        $this->password = request('password');
         // 检查是否为上次密码
         $this->checkIsLastPassword();
         // 重置密码
@@ -206,8 +207,6 @@ class UserPasswordController extends CommonController
         if ($user === null) {
             return;
         }
-
-        $this->password = request('password');
 
         $credentials = [
             'email'    => $user['email'],
