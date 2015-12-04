@@ -28,7 +28,7 @@ return [
         'array'   => 'The :attribute must have between :min and :max items.',
     ],
     'boolean'              => 'The :attribute field must be true or false.',
-    'confirmed'            => 'The :attribute confirmation does not match.',
+    'confirmed'            => ':attribute 两次输入不一致。',
     'date'                 => 'The :attribute is not a valid date.',
     'date_format'          => 'The :attribute does not match the format :format.',
     'different'            => 'The :attribute and :other must be different.',
@@ -52,7 +52,7 @@ return [
     'min'                  => [
         'numeric' => 'The :attribute must be at least :min.',
         'file'    => 'The :attribute must be at least :min kilobytes.',
-        'string'  => 'The :attribute must be at least :min characters.',
+        'string'  => ':attribute 必须至少 :min 个字符。',
         'array'   => 'The :attribute must have at least :min items.',
     ],
     'not_in'               => 'The selected :attribute is invalid.',
@@ -108,8 +108,9 @@ return [
     */
 
     'attributes' => [
-        'captcha' => '验证码',
-        'token'   => '令牌',
+        'password' => '密码',
+        'captcha'  => '验证码',
+        'token'    => '令牌',
     ],
 
 ];
