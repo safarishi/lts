@@ -109,6 +109,7 @@ return [
 
     'attributes' => [
         'password' => '密码',
+        'email'    => '邮箱',
         'captcha'  => '验证码',
         'token'    => '令牌',
     ],
