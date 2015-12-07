@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DB;
 use Input;
+use Cache;
 use Validator;
 use App\Exceptions\ValidationException;
 
@@ -29,9 +30,43 @@ class CommonController extends ApiController
     protected function article()
     {
         return $this->dbRepository('sqlsrv', 'articles')
-            ->select('article_id as id', 'article_title as title', 'article_logo as thumbnail_url', 'article_writer as origin', 'article_whoadd as author', 'article_addtime as created_at')
+            ->select('article_id as id', 'article_title as title',
+                'article_logo as thumbnail_url', 'article_writer as origin',
+                'article_whoadd as author', 'article_addtime as created_at', 'article_body as content')
             ->where('article_active', 1);
 
+    }
+
+    /**
+     * [getArticleById description]
+     * @param  string $id 文章id
+     * @return todo
+     */
+    protected function getArticleById($id)
+    {
+        $key = 'articles/'.$id;
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
+
+        $article = $this->article()
+            ->where('article_id', $id)
+            ->first();
+        // 缓存文章详情
+        // $minutes = 7*24*60;
+        $minutes = 60*24*60;
+        Cache::put($key, $article, $minutes);
+
+        return $article;
+    }
+
+    protected function getArticleBriefById($id)
+    {
+        $article = $this->getArticleById($id);
+
+        unset($article->content);
+
+        return $article;
     }
 
     /**
