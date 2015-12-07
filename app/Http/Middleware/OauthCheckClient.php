@@ -15,12 +15,11 @@ class OauthCheckClient
         $clientSecret = Input::get('client_secret');
 
         $client = DB::connection('mysql')->table('oauth_clients')
-                ->where('id', $clientId)
-                ->where('secret', $clientSecret)
-                ->get();
-
+            ->where('id', $clientId)
+            ->where('secret', $clientSecret)
+            ->get();
         if (empty($client)) {
-            throw new UnauthorizedClientException('未授权的客户端');
+            throw new UnauthorizedClientException('未授权的客户端。');
         }
 
         return $next($request);
