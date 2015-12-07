@@ -25,6 +25,9 @@ Route::patterns([
 Route::group(['prefix' => 'v1'], function () {
     Route::get('articles', 'ArticleV1Controller@index');
     Route::get('articles/{id}', 'ArticleV1Controller@show');
+    // 收藏文章
+    Route::put('articles/{id}/stars', 'ArticleV1Controller@star');
+    Route::delete('articles/{id}/stars', 'ArticleV1Controller@unstar');
     // 用户注册
     Route::post('users', 'UserV1Controller@store');
     Route::post('oauth/access_token', 'OAuthController@postAccessToken');

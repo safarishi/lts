@@ -8,7 +8,7 @@ use Request;
 use Response;
 use App\Exceptions\ValidationException;
 use LucaDegasperi\OAuth2Server\Authorizer;
-use App\Exceptions\DuplicateOperationException;
+use App\Exceptions\DuplicateOperateException;
 
 class ArticleController extends CommonController
 {
@@ -275,7 +275,7 @@ class ArticleController extends CommonController
         $uid = $this->authorizer->getResourceOwnerId();
 
         if ($this->checkUserStar($uid, $id)) {
-            throw new DuplicateOperationException('您已收藏！');
+            throw new DuplicateOperateException('您已收藏:(');
         }
 
         $this->models['user']
