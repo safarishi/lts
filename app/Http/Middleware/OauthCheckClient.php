@@ -8,7 +8,7 @@ use Closure;
 use App\Exceptions\UnauthorizedClientException;
 use League\OAuth2\Server\Exception\InvalidRequestException;
 
-class OauthCheckClient
+class OAuthCheckClient
 {
     public function handle($request, Closure $next)
     {
@@ -25,8 +25,8 @@ class OauthCheckClient
         $client = DB::connection('mysql')->table('oauth_clients')
             ->where('id', $clientId)
             ->where('secret', $clientSecret)
-            ->get();
-        if (empty($client)) {
+            ->exists();
+        if (!$client) {
             throw new UnauthorizedClientException;
         }
 
