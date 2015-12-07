@@ -11,7 +11,7 @@ class ArticleV1Controller extends ArticleController
         $article = $this->getArticleById($id);
 
         if ($article === null) {
-            return [];
+            throw new ValidationException('文章参数传递错误:(');
         }
 
         $tmp = clone $article;
