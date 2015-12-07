@@ -18,7 +18,9 @@ class Kernel extends HttpKernel
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         // \App\Http\Middleware\VerifyCsrfToken::class,
-        \LucaDegasperi\OAuth2Server\Middleware\OAuthExceptionHandlerMiddleware::class,
+        // bak of oauth global middleware
+        // \LucaDegasperi\OAuth2Server\Middleware\OAuthExceptionHandlerMiddleware::class,
+        \App\Http\Middleware\OAuthExceptionHandlerMiddleware::class,
     ];
 
     /**
