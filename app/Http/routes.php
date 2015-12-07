@@ -17,6 +17,10 @@ Route::get('/', function()
     return view('welcome');
 });
 
+Route::group(['prefix' => 'v1'], function () {
+    Route::post('oauth/access_token', 'OAuthController@postAccessToken');
+});
+
 // middleware auth todo
 // 可能需要去掉
 // Route::get('oauth/authorize', ['as' => 'oauth.authorize.get','middleware' => ['check-authorization-params', 'auth'], function() {
