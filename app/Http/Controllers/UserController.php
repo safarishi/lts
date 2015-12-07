@@ -28,7 +28,7 @@ class UserController extends CommonController
 
     private static $_validate = [
         'store' => [
-            'email' => 'required|email|unique:user',
+            'email'    => 'required|email|unique:user',
             'password' => 'required|min:6|confirmed',
         ],
     ];
