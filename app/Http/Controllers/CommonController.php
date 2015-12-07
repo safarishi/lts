@@ -138,18 +138,6 @@ class CommonController extends ApiController
         return in_array($uid, $favouredUser, true);
     }
 
-    // 校验内容必填 todo
-    protected function contentRequired()
-    {
-        // validator
-        $validator = Validator::make(Input::all(), [
-            'content' => 'required',
-        ]);
-        if ($validator->fails()) {
-            throw new ValidationException($validator->messages()->all());
-        }
-    }
-
     /**
      * 处理评论返回数据
      *
