@@ -17,7 +17,14 @@ Route::get('/', function()
     return view('welcome');
 });
 
+Route::patterns([
+    'id' => '[1-9][0-9]*',
+    'comment_id' => '[1-9][0-9]*',
+]);
+
 Route::group(['prefix' => 'v1'], function () {
+    Route::get('articles', 'ArticleV1Controller@index');
+    Route::get('articles/{id}', 'ArticleV1Controller@show');
     Route::post('oauth/access_token', 'OAuthController@postAccessToken');
 });
 
