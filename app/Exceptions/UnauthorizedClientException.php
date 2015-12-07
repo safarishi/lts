@@ -2,11 +2,13 @@
 
 namespace App\Exceptions;
 
+use Lang;
+
 class UnauthorizedClientException extends ApiException
 {
-    public function __construct($msg)
+    public function __construct()
     {
-        parent::__construct($msg, 14005);
+        parent::__construct(Lang::get('oauth.unauthorized_client'), 14005);
         $this->httpStatusCode = 401;
         $this->errorType = 'invalid_client';
     }
