@@ -33,6 +33,9 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('articles/{id}/comments/{comment_id}/replies', 'CommentV1Controller@reply');
     // 匿名回复评论
     Route::post('articles/{id}/comments/{comment_id}/anonymous_replies', 'CommentV1Controller@anonymousReply');
+    // 评论点赞
+    Route::put('articles/{id}/comments/{comment_id}/favours', 'CommentV1Controller@favour');
+    Route::delete('articles/{id}/comments/{comment_id}/favours', 'CommentV1Controller@unfavour');
     // 用户注册
     Route::post('users', 'UserV1Controller@store');
     Route::post('oauth/access_token', 'OAuthController@postAccessToken');
