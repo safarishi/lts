@@ -36,6 +36,8 @@ Route::group(['prefix' => 'v1'], function () {
     // 用户注册
     Route::post('users', 'UserV1Controller@store');
     Route::post('oauth/access_token', 'OAuthController@postAccessToken');
+    // 修改用户的信息
+    Route::post('user', 'UserV1Controller@modify');
 });
 
 // middleware auth todo
