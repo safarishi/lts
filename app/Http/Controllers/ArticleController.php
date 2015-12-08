@@ -209,31 +209,13 @@ class ArticleController extends CommonController
     protected function getHotComments($id)
     {
         $hotComments = $this->dbRepository('mongodb', 'article_comment')
-            ->select('content', 'created_at', 'user', 'favoured_user')
+            ->select('content', 'created_at', 'user', 'favoured_user', 'article')
             ->where('article.id', $id)
             ->orderBy('created_at', 'desc')
             ->take(2)
             ->get();
 
-        return $this->processCommentResponse($hotComments);
-    }
-
-    /**
-     * [processCommentResponse description]
-     * @param  array $data [description]
-     * @return array       [description]
-     */
-    protected function processCommentResponse($data)
-    {
-        $response = $this->handleCommentResponse($data);
-
-        foreach ($response as &$value) {
-            $value['article'] = $this->models['article'];
-            unset($value['favoured_user']);
-        }
-        unset($value);
-
-        return $response;
+        return $this->handleCommentResponse($hotComments);
     }
 
     protected function checkUserArticleStar($id)
