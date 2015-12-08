@@ -17,10 +17,7 @@ Route::get('/', function()
     return view('welcome');
 });
 
-Route::patterns([
-    'id' => '[1-9][0-9]*',
-    'comment_id' => '[1-9][0-9]*',
-]);
+Route::patterns(['id' => '[1-9][0-9]*']);
 
 Route::group(['prefix' => 'v1'], function () {
     Route::get('articles', 'ArticleV1Controller@index');
