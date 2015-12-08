@@ -300,7 +300,7 @@ class ArticleController extends CommonController
      * 文章评论
      *
      * @param  string $id 文章id
-     * @return [type]     [description]
+     * @return array
      */
     public function comment($id)
     {
@@ -317,11 +317,12 @@ class ArticleController extends CommonController
      * 文章评论返回数据
      *
      * @param  string $id 文章id
-     * @return todo
+     * @return array
      */
     protected function commentResponse($id)
     {
-        $article = (array) $this->article()->where('article_id', $id)
+        $article = (array) $this->article()
+            ->where('article_id', $id)
             ->select('article_id as id', 'article_writer as origin')
             ->first();
 
@@ -343,7 +344,7 @@ class ArticleController extends CommonController
      * 匿名评论文章
      *
      * @param  string $id 文章id
-     * @return [type]     [description]
+     * @return array
      */
     public function anonymousComment($id)
     {
