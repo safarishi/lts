@@ -12,7 +12,7 @@ class CommentController extends CommonController
     public function __construct(Authorizer $authorizer)
     {
         parent::__construct($authorizer);
-        $this->middleware('oauth', ['except' => ['todo']]);
+        $this->middleware('oauth', ['except' => ['anonymousReply']]);
         $this->middleware('validation');
     }
 
