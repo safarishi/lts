@@ -23,7 +23,7 @@ class ArticleV1Controller extends ArticleController
         $article->content = preg_replace('#(src=")/#', "\$1".'http://sisi-smu.org/', $tmpContent);
         $article->thumbnail_url = $this->addImagePrefixUrl($article->thumbnail_url);
         // 是否收藏文章
-        // todo
+        $article->is_starred = $this->isStarred($id);
         // 相关文章
         $this->origin = $article->origin;
         $relatedArticles = $this->getRelatedArticles($id);
@@ -35,6 +35,23 @@ class ArticleV1Controller extends ArticleController
             'releated_articles' => $relatedArticles,
             'hot_comments' => $hotComments,
         ];
+    }
+
+    /**
+     * 文章是否收藏
+     *
+     * @param  string  $id 文章id
+     * @return boolean
+     */
+    protected function isStarred($id)
+    {
+        if (!$this->accessToken) {
+            return false;
+        }
+
+        $uid = $this->getOwnerId();
+
+        return $this->checkUserStar($uid, $id);
     }
 
     protected function getRelatedArticles($id)
