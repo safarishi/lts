@@ -13,7 +13,7 @@
 
 Route::get('/', function()
 {
-    return 'lts';
+    echo 'lts';
     return view('welcome');
 });
 
