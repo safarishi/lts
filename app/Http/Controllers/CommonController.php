@@ -143,7 +143,7 @@ class CommonController extends ApiController
             $starred = $user['starred_articles'];
         }
 
-        return in_array($articleId, $starred);
+        return in_array($articleId, $starred, true);
     }
 
     /**
