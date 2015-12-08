@@ -25,6 +25,14 @@ Route::group(['prefix' => 'v1'], function () {
     // 收藏文章
     Route::put('articles/{id}/stars', 'ArticleV1Controller@star');
     Route::delete('articles/{id}/stars', 'ArticleV1Controller@unstar');
+    // 评论文章
+    Route::post('articles/{id}/comments', 'ArticleV1Controller@comment');
+    // 匿名评论文章
+    Route::post('articles/{id}/anonymous_comments', 'ArticleV1Controller@anonymousComment');
+    // 评论回复
+    Route::post('articles/{id}/comments/{comment_id}/replies', 'CommentV1Controller@reply');
+    // 匿名回复评论
+    Route::post('articles/{id}/comments/{comment_id}/anonymous_replies', 'CommentV1Controller@anonymousReply');
     // 用户注册
     Route::post('users', 'UserV1Controller@store');
     Route::post('oauth/access_token', 'OAuthController@postAccessToken');
