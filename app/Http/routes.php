@@ -41,6 +41,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('oauth/access_token', 'OAuthController@postAccessToken');
     // 修改用户的信息
     Route::post('user', 'UserV1Controller@modify');
+    // report
+    Route::get('reports', 'ArticleV1Controller@report');
 });
 
 // middleware auth todo
