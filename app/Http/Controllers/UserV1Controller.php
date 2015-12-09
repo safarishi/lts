@@ -48,4 +48,18 @@ class UserV1Controller extends UserController
 
         return $articles;
     }
+
+    public function myInformation()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $model = DB::collection('information')
+            ->where('content.comment.user._id', $uid)
+            ->latest('created_at');
+        // 增加数据分页
+        $this->addPagination($model);
+
+        return $model->get();
+    }
+
 }
