@@ -50,6 +50,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::put('user/password', 'UserPasswordV1Controller@modify');
     // 发送验证邮件，找回密码
     Route::post('send/emails', 'UserPasswordV1Controller@sendEmail');
+    // 重置密码
+    Route::put('reset/password', 'UserPasswordV1Controller@reset');
     // 我的评论
     Route::get('user/comments', 'UserV1Controller@myComment');
     // 我的收藏

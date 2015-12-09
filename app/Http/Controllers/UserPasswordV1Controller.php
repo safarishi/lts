@@ -21,6 +21,9 @@ class UserPasswordV1Controller extends UserPasswordController
         'sendEmail' => [
             'email' => 'required|email|exists:user',
         ],
+        'reset' => [
+            'password' => 'required|min:6|confirmed'
+        ],
     ];
 
     public function modify()
