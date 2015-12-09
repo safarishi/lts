@@ -136,7 +136,7 @@ class UserController extends CommonController
             ->where('user._id', $uid)
             ->orderBy('created_at', 'desc');
 
-        MultiplexController::addPagination($commentModel);
+        $this->addPagination($commentModel);
 
         $data = $commentModel->get();
 
@@ -156,10 +156,10 @@ class UserController extends CommonController
             return [];
         }
 
-        $articleModel = $this->article()
+        $articleModel = $this->partArticle()
             ->whereIn('article_id', $articleIds);
 
-        MultiplexController::addPagination($articleModel);
+        $this->addPagination($articleModel);
 
         return $articleModel->get();
     }
@@ -171,9 +171,8 @@ class UserController extends CommonController
         $model = $this->dbRepository('mongodb', 'information')
             ->where('content.comment.user._id', $uid)
             ->orderBy('created_at', 'desc');
-
         // 增加数据分页
-        MultiplexController::addPagination($model);
+        $this->addPagination($model);
 
         return $model->get();
     }

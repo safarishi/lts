@@ -395,7 +395,7 @@ class ArticleController extends CommonController
             ->orWhere('article_writer', 'like', "%{$q}%")
             ->orWhere('article_whoadd', 'like', "%{$q}%");
         // 返回数据增加分页
-        MultiplexController::addPagination($articleModel);
+        $this->addPagination($articleModel);
 
         return $articleModel->orderBy('article_addtime', 'desc')
             ->get();
