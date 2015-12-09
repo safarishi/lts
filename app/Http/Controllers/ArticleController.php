@@ -390,7 +390,7 @@ class ArticleController extends CommonController
         // 查询关键词
         $q = Input::get('q', '');
 
-        $articleModel = $this->article()
+        $articleModel = $this->partArticle()
             ->where('article_title', 'like', "%{$q}%")
             ->orWhere('article_writer', 'like', "%{$q}%")
             ->orWhere('article_whoadd', 'like', "%{$q}%");
