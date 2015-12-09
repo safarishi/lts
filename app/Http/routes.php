@@ -19,7 +19,7 @@ Route::get('/', function()
 
 Route::patterns([
     'id' => '[1-9][0-9]*',
-    'column_id' => '[1-9][0-9]',
+    'column_id' => '[1-9][0-9]*',
 ]);
 
 Route::group(['prefix' => 'v1'], function () {
