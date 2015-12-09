@@ -38,7 +38,7 @@ class ArticleController extends CommonController
 
     public function index()
     {
-        $pictureNews = $this->article()
+        $pictureNews = $this->partArticle()
             ->where('article_havelogo', 1)
             ->orderBy('article_addtime', 'desc')
             ->take(3)
@@ -154,7 +154,8 @@ class ArticleController extends CommonController
             $ids[] = $column->column_id;
         }
 
-        $articles = $this->article()->whereIn('article_lanmu', $ids)
+        $articles = $this->partArticle()
+            ->whereIn('article_lanmu', $ids)
             ->orderBy('article_addtime', 'desc')
             ->take(3)
             ->get();
