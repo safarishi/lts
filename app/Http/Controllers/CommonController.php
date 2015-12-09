@@ -231,4 +231,30 @@ class CommonController extends ApiController
             ->get();
     }
 
+    /**
+     * 增加数据分页
+     *
+     * @param  object \Jenssegers\Mongodb\Query\Builder 需要分页的数据模型
+     * @return void
+     */
+    protected function addPagination($model)
+    {
+        // 第几页数据，默认第 1 页
+        $page = Input::get('page', 1);
+        $page = intval($page);
+
+        // 每页显示数据条目，默认每页 20 条
+        $perPage = Input::get('per_page', 20);
+        $perPage = intval($perPage);
+
+        if ($page <= 0 || !is_int($page)) {
+            $page = 1;
+        }
+        if (!is_int($perPage) || $perPage < 1 || $perPage > 100) {
+            $perPage = 20;
+        }
+        // skip -- offset , take -- limit
+        $model->skip(($page - 1) * $perPage)->take($perPage);
+    }
+
 }
