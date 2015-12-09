@@ -125,7 +125,8 @@ class ArticleController extends CommonController
 
     protected function getArticlesByColumnId($id)
     {
-        $articles = $this->article()->where('article_lanmu', $id)
+        $articles = $this->partArticle()
+            ->where('article_lanmu', $id)
             ->orderBy('article_addtime', 'desc')
             ->take(3)
             ->get();
@@ -429,7 +430,7 @@ class ArticleController extends CommonController
             ->get();
 
         foreach ($data as $value) {
-            $value->articles = $this->article()
+            $value->articles = $this->partArticle()
                 ->where('article_lanmu', $id)
                 ->orderBy('article_addtime', 'desc')
                 ->take(20)
