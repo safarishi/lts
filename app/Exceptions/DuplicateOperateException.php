@@ -8,6 +8,6 @@ class DuplicateOperateException extends ApiException
     {
         parent::__construct($msg, 14003);
         $this->httpStatusCode = 409;
-        $this->errorType = 'conflict_operation';
+        $this->errorType = 'operation_conflict';
     }
 }
