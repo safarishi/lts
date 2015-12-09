@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use LucaDegasperi\OAuth2Server\Authorizer;
 
 class UserV1Controller extends UserController
@@ -18,4 +19,13 @@ class UserV1Controller extends UserController
             'password' => 'required|min:6|confirmed',
         ],
     ];
+
+    public function show()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $fields = ['avatar_url', 'email', 'gender', 'display_name', 'company'];
+
+        return DB::collection('user')->find($uid, $fields);
+    }
 }

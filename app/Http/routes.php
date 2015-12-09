@@ -42,6 +42,8 @@ Route::group(['prefix' => 'v1'], function () {
     // 用户注册
     Route::post('users', 'UserV1Controller@store');
     Route::post('oauth/access_token', 'OAuthController@postAccessToken');
+    // 获取当前登录用户的信息
+    Route::get('user', 'UserV1Controller@show');
     // user logout
     Route::delete('oauth/invalidate_token', 'UserV1Controller@logout');
     // 修改用户的信息
