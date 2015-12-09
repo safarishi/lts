@@ -48,6 +48,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('user', 'UserV1Controller@modify');
     // 修改用户的登录密码
     Route::put('user/password', 'UserPasswordV1Controller@modify');
+    // 发送验证邮件，找回密码
+    Route::post('send/emails', 'UserPasswordV1Controller@sendEmail');
     // 我的评论
     Route::get('user/comments', 'UserV1Controller@myComment');
     // 我的收藏

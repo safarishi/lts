@@ -18,6 +18,9 @@ class UserPasswordV1Controller extends UserPasswordController
             'old_password' => 'required',
             'new_password' => 'required|min:6|confirmed'
         ],
+        'sendEmail' => [
+            'email' => 'required|email|exists:user',
+        ],
     ];
 
     public function modify()
