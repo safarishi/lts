@@ -27,14 +27,30 @@ class CommonController extends ApiController
         return DB::connection($connection)->table($name);
     }
 
+    /**
+     * 文章详情信息字段返回
+     *
+     * @return object \Illuminate\Database\Query\Builder
+     */
     protected function article()
+    {
+        return $this->partArticle()->addSelect('article_body as content');
+
+    }
+
+    /**
+     * 文章信息字段包裹返回
+     * 比文章详情字段少了 content 字段
+     *
+     * @return object \Illuminate\Database\Query\Builder
+     */
+    protected function partArticle()
     {
         return $this->dbRepository('sqlsrv', 'articles')
             ->select('article_id as id', 'article_title as title',
                 'article_logo as thumbnail_url', 'article_writer as origin',
-                'article_whoadd as author', 'article_addtime as created_at', 'article_body as content')
+                'article_whoadd as author', 'article_addtime as created_at')
             ->where('article_active', 1);
-
     }
 
     /**
