@@ -108,11 +108,13 @@ return [
     */
 
     'attributes' => [
-        'password' => '密码',
-        'email'    => '邮箱',
-        'captcha'  => '验证码',
-        'token'    => '令牌',
-        'content'  => '内容',
+        'password'     => '密码',
+        'old_password' => '旧密码',
+        'new_password' => '新密码',
+        'email'        => '邮箱',
+        'captcha'      => '验证码',
+        'token'        => '令牌',
+        'content'      => '内容',
     ],
 
 ];
