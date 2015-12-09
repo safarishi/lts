@@ -35,7 +35,7 @@ return [
     'digits'               => 'The :attribute must be :digits digits.',
     'digits_between'       => 'The :attribute must be between :min and :max digits.',
     'email'                => ':attribute 不是一个合法的邮箱地址。',
-    'exists'               => 'The selected :attribute is invalid.',
+    'exists'               => ':attribute 不存在。',
     'filled'               => 'The :attribute field is required.',
     'image'                => 'The :attribute must be an image.',
     'in'                   => 'The selected :attribute is invalid.',

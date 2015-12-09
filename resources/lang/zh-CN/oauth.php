@@ -2,7 +2,7 @@
 
 return [
 
-    'invalid_credentials'    => '帐号密码不正确。',
+    'invalid_credentials'    => '帐号或密码不正确。',
     'access_denied'          => '验证服务器拒绝访问。',
     'invalid_client'         => '客户端验证失败。',
     'invalid_grant'          => '无效的授权方式。',
