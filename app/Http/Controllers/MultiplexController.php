@@ -56,30 +56,30 @@ class MultiplexController extends CommonController
         return $result;
     }
 
-    /**
-     * 增加数据分页
-     *
-     * @param  object $model 需要分页的数据模型
-     * @return void
-     */
-    public static function addPagination($model)
-    {
-        // 第几页数据，默认为第一页
-        $page    = Input::get('page', 1);
-        // 每页显示数据条目，默认为每页20条
-        $perPage = Input::get('per_page', 20);
-        $page    = intval($page);
-        $perPage = intval($perPage);
+    // /**
+    //  * 增加数据分页
+    //  *
+    //  * @param  object $model 需要分页的数据模型
+    //  * @return void
+    //  */
+    // public static function addPagination($model)
+    // {
+    //     // 第几页数据，默认为第一页
+    //     $page    = Input::get('page', 1);
+    //     // 每页显示数据条目，默认为每页20条
+    //     $perPage = Input::get('per_page', 20);
+    //     $page    = intval($page);
+    //     $perPage = intval($perPage);
 
-        if ($page <= 0 || !is_int($page)) {
-            $page = 1;
-        }
-        if (!is_int($perPage) || $perPage < 1 || $perPage > 100) {
-            $perPage = 20;
-        }
-        // skip -- offset , take -- limit
-        $model->skip(($page - 1) * $perPage)->take($perPage);
-    }
+    //     if ($page <= 0 || !is_int($page)) {
+    //         $page = 1;
+    //     }
+    //     if (!is_int($perPage) || $perPage < 1 || $perPage > 100) {
+    //         $perPage = 20;
+    //     }
+    //     // skip -- offset , take -- limit
+    //     $model->skip(($page - 1) * $perPage)->take($perPage);
+    // }
 
     /**
      * 上传用户头像
