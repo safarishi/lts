@@ -45,6 +45,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('user', 'UserV1Controller@modify');
     // report
     Route::get('reports', 'ArticleV1Controller@report');
+    // search articles
+    Route::get('search/articles', 'ArticleV1Controller@search');
 });
 
 // middleware auth todo
