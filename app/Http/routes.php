@@ -17,7 +17,10 @@ Route::get('/', function()
     return view('welcome');
 });
 
-Route::patterns(['id' => '[1-9][0-9]*']);
+Route::patterns([
+    'id' => '[1-9][0-9]*',
+    'column_id' => '[1-9][0-9]',
+]);
 
 Route::group(['prefix' => 'v1'], function () {
     Route::get('articles', 'ArticleV1Controller@index');
@@ -47,6 +50,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('reports', 'ArticleV1Controller@report');
     // search articles
     Route::get('search/articles', 'ArticleV1Controller@search');
+    // more articles
+    Route::get('more_articles/{column_id}', 'ArticleV1Controller@moreArticle');
 });
 
 // middleware auth todo
