@@ -120,7 +120,7 @@ class UserController extends CommonController
 
     public function logout()
     {
-        $oauthAccessToken = DB::table('oauth_access_tokens');
+        $oauthAccessToken = DB::connection('mysql')->table('oauth_access_tokens');
 
         $oauthAccessToken->where('id', $this->accessToken)->delete();
 
