@@ -126,7 +126,7 @@ class CommonController extends ApiController
      *
      * @param  string $uid       用户id
      * @param  string $articleId 文章id
-     * @return todo
+     * @return boolean
      */
     protected function checkUserStar($uid, $articleId)
     {
