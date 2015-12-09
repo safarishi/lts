@@ -48,6 +48,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('user', 'UserV1Controller@modify');
     // 我的评论
     Route::get('user/comments', 'UserV1Controller@myComment');
+    // 我的收藏
+    Route::get('user/stars', 'UserV1Controller@myStar');
     // user logout
     Route::delete('oauth/invalidate_token', 'UserV1Controller@logout');
     // report

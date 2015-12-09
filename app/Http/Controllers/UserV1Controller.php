@@ -28,4 +28,24 @@ class UserV1Controller extends UserController
 
         return DB::collection('user')->find($uid, $fields);
     }
+
+    public function myStar()
+    {
+        $uid = $this->authorizer->getResourceOwnerId();
+
+        $articleIdArr = DB::collection('user')
+            ->where('_id', $uid)
+            ->pluck('starred_articles');
+        if (!$articleIdArr) {
+            return [];
+        }
+        // 反转数组
+        $idArr = array_reverse($articleIdArr);
+        $articles = [];
+        foreach ($idArr as $id) {
+            $articles[] = $this->getArticleBriefById($id);
+        }
+
+        return $articles;
+    }
 }
