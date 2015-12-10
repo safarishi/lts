@@ -83,6 +83,7 @@ Route::group(['prefix' => 'v1'], function () {
     get('redirect_urls/{type}', 'ThirdPartyLoginV1Controller@redirectUrl')
         ->where('type', 'weibo|qq|weixin');
     get('weibo_callback', 'ThirdPartyLoginV1Controller@weiboCallback');
+    get('qq_callback', 'ThirdPartyLoginV1Controller@qqCallback');
     // via temporary toke to get the user login entry
     get('entry', 'ThirdPartyLoginV1Controller@entry');
 });

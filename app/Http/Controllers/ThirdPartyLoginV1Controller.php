@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DB;
 use App\Exceptions\ValidationException;
+use App\Exceptions\InvalidClientException;
 
 class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 {
@@ -188,6 +189,32 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
         $tmpToken = MultiplexController::temporaryToken();
         // store Open ID
+        $this->storeOpenId($openId, $tmpToken);
+
+        return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
+    }
+
+    public function qqCallback()
+    {
+        if (request('state') !== 'test') {
+            throw new InvalidClientException('客户端不允许:(');
+        }
+
+        $this->type = 'qq';
+
+        $openId = $this->getOpenId();
+
+        $result = $this->hasOpenId($openId);
+        if ($result) {
+            return 'Has Open Id //<br />'.$result;
+        }
+
+        $user = $this->fetchUser($openId);
+
+        $avatarUrl = $user->figureurl_qq_2;
+
+        $tmpToken = MultiplexController::temporaryToken();
+
         $this->storeOpenId($openId, $tmpToken);
 
         return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
