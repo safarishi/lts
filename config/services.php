@@ -36,21 +36,21 @@ return [
     ],
 
     'weibo' => [
-        'AppId'       => env('WEIBO_KEY'),
-        'AppSecret'   => env('WEIBO_SECRET'),
-        'CallbackUrl' => env('WEIBO_REDIRECT_URI'),
+        'AppId'       => env('WEIBO_APP_ID'),
+        'AppSecret'   => env('WEIBO_APP_SECRET'),
+        'CallbackUrl' => env('WEIBO_CALLBACK_URL'),
     ],
 
     'qq' => [
-        'AppId'       => env('APP_ID'),
-        'AppSecret'   => env('APP_SECRET'),
-        'CallbackUrl' => env('REDIRECT'),
+        'AppId'       => env('QQ_APP_ID'),
+        'AppSecret'   => env('QQ_APP_SECRET'),
+        'CallbackUrl' => env('QQ_CALLBACK_URL'),
     ],
 
-    'weixin' => array(
+    'weixin' => [
         'AppId'       => env('WEIXIN_APP_ID'),
         'AppSecret'   => env('WEIXIN_APP_SECRET'),
-        'CallbackUrl' => env('WEIXIN_CALLBACK'),
-    ),
+        'CallbackUrl' => env('WEIXIN_CALLBACK_URL'),
+    ],
 
 ];
