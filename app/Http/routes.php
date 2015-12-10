@@ -85,6 +85,8 @@ Route::group(['prefix' => 'v1'], function () {
     get('weibo_callback', 'ThirdPartyLoginV1Controller@weiboCallback');
     get('qq_callback', 'ThirdPartyLoginV1Controller@qqCallback');
     get('weixin_callback', 'ThirdPartyLoginV1Controller@weixinCallback');
+    get('callbacks/{type}', 'ThirdPartyLoginV1Controller@callback')
+        ->where('type', 'weibo|qq|weixin');
     // via temporary toke to get the user login entry
     get('entry', 'ThirdPartyLoginV1Controller@entry');
 });

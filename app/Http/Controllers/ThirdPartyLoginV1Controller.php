@@ -56,17 +56,17 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
             case 'weibo':
                 $url = 'https://api.weibo.com/oauth2/authorize?client_id='.
                     $serviceConfig['AppId'].'&redirect_uri='.
-                    urlencode($serviceConfig['CallbackUrl']).'&response_type=code';
+                    urlencode($serviceConfig['CallbackUrl']).'&response_type=code&state=weiboTest';
                 break;
             case 'qq':
                 $url = 'https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id='.
                     $serviceConfig['AppId'].'&redirect_uri='.
-                    urlencode($serviceConfig['CallbackUrl']).'&state=test';
+                    urlencode($serviceConfig['CallbackUrl']).'&state=qqTest';
                 break;
             case 'weixin':
                 $url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='.
                     $serviceConfig['AppId'].'&redirect_uri='.
-                    urlencode($serviceConfig['CallbackUrl']).'&response_type=code&scope=snsapi_userinfo&state=test#wechat_redirect';
+                    urlencode($serviceConfig['CallbackUrl']).'&response_type=code&scope=snsapi_userinfo&state=weixinTest#wechat_redirect';
                 break;
             default:
                 # code...
@@ -128,22 +128,21 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
     protected function fetchUser($openId)
     {
+        $this->curlMethod = 'GET';
+
         switch ($this->type) {
             case 'weibo':
                 $this->curlUrl = 'https://api.weibo.com/2/users/show.json?access_token='.$this->accessToken.'&uid='.$openId;
-                $this->curlMethod = 'GET';
                 break;
             case 'qq':
                 $this->curlUrl = 'https://graph.qq.com/user/get_user_info?access_token='.
                     $this->accessToken.'&openid='.
                     $openId.'&appid='.$this->serviceConfig['AppId'];
-                $this->curlMethod = 'GET';
                 break;
             case 'weixin':
                 $this->curlUrl = 'https://api.weixin.qq.com/sns/userinfo?access_token='.
                     $this->accessToken.'&openid='.
                     $openId.'&lang=zh_CN';
-                $this->curlMethod = 'GET';
                 break;
             default:
                 # code...
@@ -176,6 +175,11 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
     public function weiboCallback()
     {
         $this->type = 'weibo';
+
+        if (request('state') !== $this->type.'Test') {
+            throw new InvalidClientException('客户端不允许:(');
+        }
+
         // 获取第三方用户 Open ID
         $openId = $this->getOpenId();
 
@@ -186,7 +190,34 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
         $user = $this->fetchUser($openId);
 
-        $avatarUrl = $user->avatar_hd;
+        $avatarUrl = $this->getUserAvatarUrl($user);
+
+        $tmpToken = MultiplexController::temporaryToken();
+        // store Open ID
+        $this->storeOpenId($openId, $tmpToken);
+
+        return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
+    }
+
+    public function callback($type)
+    {
+        $this->type = $type;
+
+        if (request('state') !== $this->type.'Test') {
+            throw new InvalidClientException('客户端不允许:(');
+        }
+
+        // 获取第三方用户 Open ID
+        $openId = $this->getOpenId();
+
+        $result = $this->hasOpenId($openId);
+        if ($result) {
+            return 'Has Open Id //<br />'.$result;
+        }
+
+        $user = $this->fetchUser($openId);
+
+        $avatarUrl = $this->getUserAvatarUrl($user);
 
         $tmpToken = MultiplexController::temporaryToken();
         // store Open ID
@@ -197,11 +228,11 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
     public function qqCallback()
     {
-        if (request('state') !== 'test1') {
+        $this->type = 'qq';
+
+        if (request('state') !== $this->type.'Test') {
             throw new InvalidClientException('客户端不允许:(');
         }
-
-        $this->type = 'qq';
 
         $openId = $this->getOpenId();
 
@@ -212,38 +243,23 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
         $user = $this->fetchUser($openId);
 
-        $avatarUrl = $user->figureurl_qq_2;
+        $avatarUrl = $this->getUserAvatarUrl($user);
 
         $tmpToken = MultiplexController::temporaryToken();
 
         $this->storeOpenId($openId, $tmpToken);
 
         return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
-    }
-
-    public function entry()
-    {
-        $token = request('token');
-
-        if (strlen($token) != 30) {
-            throw new ValidationException('令牌参数传递错误:(');
-        }
-
-        $entry = DB::collection('user')
-            ->where('addition.token', $token)
-            ->pluck('entry');
-
-        if ($entry === null) {
-            throw new ValidationException('令牌已失效:(');
-        }
-
-        return $entry;
     }
 
     public function weixinCallback()
     {
         $this->type = 'weixin';
 
+        if (request('state') !== $this->type.'Test') {
+            throw new InvalidClientException('客户端不允许:(');
+        }
+
         $openId = $this->getOpenId();
 
         $result = $this->hasOpenId($openId);
@@ -253,13 +269,33 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
         $user = $this->fetchUser($openId);
 
-        $avatarUrl = $user->headimgurl;
+        $avatarUrl = $this->getUserAvatarUrl($user);
 
         $tmpToken = MultiplexController::temporaryToken();
 
         $this->storeOpenId($openId, $tmpToken);
 
         return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
+    }
+
+    protected function getUserAvatarUrl($user)
+    {
+        switch ($this->type) {
+            case 'weibo':
+                $avatarUrl = $user->avatar_hd;
+                break;
+            case 'qq':
+                $avatarUrl = $user->figureurl_qq_2;
+                break;
+            case 'weixin':
+                $avatarUrl = $user->headimgurl;
+                break;
+            default:
+                $avatarUrl = config('imagecache.paths.avatar_url_prefix').'/default.png';
+                break;
+        }
+
+        return $avatarUrl;
     }
 
     public function entry()
@@ -280,4 +316,5 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
         return $entry;
     }
+
 }
