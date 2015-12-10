@@ -8,6 +8,6 @@ class InvalidClientException extends ApiException
     {
         parent::__construct($msg, 14007);
         $this->httpStatusCode = 400;
-        $this->errorType = 'invalid_client';
+        $this->errorType = 'invalid_operation';
     }
 }
