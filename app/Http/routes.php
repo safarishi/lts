@@ -72,6 +72,9 @@ Route::group(['prefix' => 'v1'], function () {
     get('products', 'ArticleV1Controller@product');
     // 团队
     get('teams', 'ArticleV1Controller@team');
+    // generate temporary token
+    get('generate_token', 'MultiplexController@generateToken');
+    get('generate_captcha', 'MultiplexController@generateCaptcha');
 });
 
 // middleware auth todo

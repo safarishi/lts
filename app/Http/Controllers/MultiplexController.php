@@ -150,7 +150,7 @@ class MultiplexController extends CommonController
         $token = Input::get('token');
 
         if (strlen($token) !== 30) {
-            throw new ValidationException('token 参数传递错误');
+            throw new ValidationException('临时令牌 参数错误');
         }
 
         $mayNeedReturn = Captcha::create();
