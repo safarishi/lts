@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use DB;
 use App\Exceptions\ValidationException;
 use App\Exceptions\InvalidClientException;
+use App\Exceptions\AuthorizationEntryException;
 
 class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 {
@@ -37,7 +38,7 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
             return $response;
         }
 
-        echo 'cURL Error #:'.$err;
+        throw new AuthorizationEntryException($err);
     }
 
     public function redirectUrl($type)
@@ -196,7 +197,7 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
     public function qqCallback()
     {
-        if (request('state') !== 'test') {
+        if (request('state') !== 'test1') {
             throw new InvalidClientException('客户端不允许:(');
         }
 
