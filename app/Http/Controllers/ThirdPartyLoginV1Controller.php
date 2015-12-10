@@ -172,33 +172,6 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
         DB::collection('user')->insert($insertData);
     }
 
-    public function weiboCallback()
-    {
-        $this->type = 'weibo';
-
-        if (request('state') !== $this->type.'Test') {
-            throw new InvalidClientException('客户端不允许:(');
-        }
-
-        // 获取第三方用户 Open ID
-        $openId = $this->getOpenId();
-
-        $result = $this->hasOpenId($openId);
-        if ($result) {
-            return 'Has Open Id //<br />'.$result;
-        }
-
-        $user = $this->fetchUser($openId);
-
-        $avatarUrl = $this->getUserAvatarUrl($user);
-
-        $tmpToken = MultiplexController::temporaryToken();
-        // store Open ID
-        $this->storeOpenId($openId, $tmpToken);
-
-        return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
-    }
-
     public function callback($type)
     {
         $this->type = $type;
@@ -221,58 +194,6 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 
         $tmpToken = MultiplexController::temporaryToken();
         // store Open ID
-        $this->storeOpenId($openId, $tmpToken);
-
-        return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
-    }
-
-    public function qqCallback()
-    {
-        $this->type = 'qq';
-
-        if (request('state') !== $this->type.'Test') {
-            throw new InvalidClientException('客户端不允许:(');
-        }
-
-        $openId = $this->getOpenId();
-
-        $result = $this->hasOpenId($openId);
-        if ($result) {
-            return 'Has Open Id //<br />'.$result;
-        }
-
-        $user = $this->fetchUser($openId);
-
-        $avatarUrl = $this->getUserAvatarUrl($user);
-
-        $tmpToken = MultiplexController::temporaryToken();
-
-        $this->storeOpenId($openId, $tmpToken);
-
-        return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
-    }
-
-    public function weixinCallback()
-    {
-        $this->type = 'weixin';
-
-        if (request('state') !== $this->type.'Test') {
-            throw new InvalidClientException('客户端不允许:(');
-        }
-
-        $openId = $this->getOpenId();
-
-        $result = $this->hasOpenId($openId);
-        if ($result) {
-            return 'Has Open Id //<br />'.$result;
-        }
-
-        $user = $this->fetchUser($openId);
-
-        $avatarUrl = $this->getUserAvatarUrl($user);
-
-        $tmpToken = MultiplexController::temporaryToken();
-
         $this->storeOpenId($openId, $tmpToken);
 
         return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;

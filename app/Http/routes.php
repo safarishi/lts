@@ -20,6 +20,7 @@ Route::get('/', function()
 Route::patterns([
     'id' => '[1-9][0-9]*',
     'column_id' => '[1-9][0-9]*',
+    'type' => 'weibo|qq|weixin',
 ]);
 
 Route::group(['prefix' => 'v1'], function () {
@@ -80,13 +81,8 @@ Route::group(['prefix' => 'v1'], function () {
     // 取消小红点
     delete('user/notices', 'UserV1Controller@removeNotice');
     // third party login
-    get('redirect_urls/{type}', 'ThirdPartyLoginV1Controller@redirectUrl')
-        ->where('type', 'weibo|qq|weixin');
-    get('weibo_callback', 'ThirdPartyLoginV1Controller@weiboCallback');
-    get('qq_callback', 'ThirdPartyLoginV1Controller@qqCallback');
-    get('weixin_callback', 'ThirdPartyLoginV1Controller@weixinCallback');
-    get('callbacks/{type}', 'ThirdPartyLoginV1Controller@callback')
-        ->where('type', 'weibo|qq|weixin');
+    get('redirect_urls/{type}', 'ThirdPartyLoginV1Controller@redirectUrl');
+    get('callbacks/{type}', 'ThirdPartyLoginV1Controller@callback');
     // via temporary toke to get the user login entry
     get('entry', 'ThirdPartyLoginV1Controller@entry');
 });
