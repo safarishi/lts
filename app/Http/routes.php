@@ -79,6 +79,10 @@ Route::group(['prefix' => 'v1'], function () {
     get('user/notices', 'UserV1Controller@notice');
     // 取消小红点
     delete('user/notices', 'UserV1Controller@removeNotice');
+    // third party login
+    get('redirect_urls/{type}', 'ThirdPartyLoginV1Controller@redirectUrl')
+        ->where('type', 'weibo|qq|weixin');
+    get('weibo_callback', 'ThirdPartyLoginV1Controller@weiboCallback');
 });
 
 // middleware auth todo
