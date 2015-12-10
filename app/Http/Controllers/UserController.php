@@ -254,7 +254,7 @@ class UserController extends CommonController
     {
         $uid = $this->authorizer->getResourceOwnerId();
 
-        $exist = $this->dbRepository('mongodb', 'information')
+        $exist = DB::collection('information')
             ->where('unread', $uid)
             ->exists();
 
@@ -265,11 +265,11 @@ class UserController extends CommonController
     {
         $uid = $this->authorizer->getResourceOwnerId();
 
-        $this->dbRepository('mongodb', 'information')
+        DB::collection('information')
             ->where('unread', $uid)
             ->update(['unread' => '0']);
 
-        return Response::make('', 204);
+        return response('', 204);
     }
 
 }

@@ -75,6 +75,10 @@ Route::group(['prefix' => 'v1'], function () {
     // generate temporary token
     get('generate_token', 'MultiplexController@generateToken');
     get('generate_captcha', 'MultiplexController@generateCaptcha');
+    // 查看小红点
+    get('user/notices', 'UserV1Controller@notice');
+    // 取消小红点
+    delete('user/notices', 'UserV1Controller@removeNotice');
 });
 
 // middleware auth todo
