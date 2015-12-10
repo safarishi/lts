@@ -68,6 +68,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('more_articles/{column_id}', 'ArticleV1Controller@moreArticle');
     // 文章评论列表
     get('articles/{id}/comments', 'ArticleV1Controller@commentList');
+    // 产品
+    get('products', 'ArticleV1Controller@product');
 });
 
 // middleware auth todo

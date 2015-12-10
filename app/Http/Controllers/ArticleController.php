@@ -458,10 +458,7 @@ class ArticleController extends CommonController
 
     public function product()
     {
-        echo $this->dbRepository('sqlsrv2', 'info')
-            ->where('info_id', 5)
-            ->first()
-            ->info_desc_cn;
+        echo $this->productInfo();
     }
 
     public function team()

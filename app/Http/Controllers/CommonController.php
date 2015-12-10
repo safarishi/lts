@@ -257,4 +257,26 @@ class CommonController extends ApiController
         $model->skip(($page - 1) * $perPage)->take($perPage);
     }
 
+    /**
+     * 产品信息
+     *
+     * @return string
+     */
+    protected function productInfo()
+    {
+        $key = 'product';
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
+
+        $product = $this->dbRepository('sqlsrv-slave', 'info')
+            ->where('info_id', 5)
+            ->pluck('info_desc_cn');
+        // 缓存产品信息一天
+        $minutes = 1*24*60;
+        Cache::put($key, $product, $minutes);
+
+        return $product;
+    }
+
 }
