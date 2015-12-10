@@ -469,7 +469,7 @@ class ArticleController extends CommonController
             ->whereIn('expert_type', ['领导', '研究人员'])
             ->orderBy('expert_order', 'desc');
 
-        MultiplexController::addPagination($teamModel);
+        $this->addPagination($teamModel);
 
         $members = $teamModel->get();
 

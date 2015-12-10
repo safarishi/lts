@@ -70,6 +70,8 @@ Route::group(['prefix' => 'v1'], function () {
     get('articles/{id}/comments', 'ArticleV1Controller@commentList');
     // 产品
     get('products', 'ArticleV1Controller@product');
+    // 团队
+    get('teams', 'ArticleV1Controller@team');
 });
 
 // middleware auth todo
