@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use App\Exceptions\ValidationException;
 
 class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
 {
@@ -190,6 +191,25 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
         $this->storeOpenId($openId, $tmpToken);
 
         return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
+    }
+
+    public function entry()
+    {
+        $token = request('token');
+
+        if (strlen($token) != 30) {
+            throw new ValidationException('令牌参数传递错误:(');
+        }
+
+        $entry = DB::collection('user')
+            ->where('addition.token', $token)
+            ->pluck('entry');
+
+        if ($entry === null) {
+            throw new ValidationException('令牌已失效:(');
+        }
+
+        return $entry;
     }
 
 }
