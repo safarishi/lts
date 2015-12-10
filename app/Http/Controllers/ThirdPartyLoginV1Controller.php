@@ -240,4 +240,26 @@ class ThirdPartyLoginV1Controller extends ThirdPartyLoginController
         return $entry;
     }
 
+    public function weixinCallback()
+    {
+        $this->type = 'weixin';
+
+        $openId = $this->getOpenId();
+
+        $result = $this->hasOpenId($openId);
+        if ($result) {
+            return 'Has Open Id //<br />'.$result;
+        }
+
+        $user = $this->fetchUser($openId);
+
+        $avatarUrl = $user->headimgurl;
+
+        $tmpToken = MultiplexController::temporaryToken();
+
+        $this->storeOpenId($openId, $tmpToken);
+
+        return 'Query String //<br />'.'?avatar_url='.$avatarUrl.'&token='.$tmpToken;
+    }
+
 }
