@@ -324,7 +324,7 @@ class ThirdPartyLoginController extends CommonController
      */
     public function entry()
     {
-        $token = self::validateToken();
+        $token = MultiplexController::validateToken();
 
         $exist = DB::connection('mongodb')->collection('user')
             ->where('addition.token', $token)
