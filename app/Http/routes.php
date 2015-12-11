@@ -17,6 +17,12 @@ Route::get('/', function()
     return view('welcome');
 });
 
+post('provinces/cities', 'MultiplexController@city');
+
+get('data/1', 'MultiplexController@allData');
+
+get('data/{id}', 'MultiplexController@getData');
+
 Route::patterns([
     'id' => '[1-9][0-9]*',
     'column_id' => '[1-9][0-9]*',

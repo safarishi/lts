@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .hide {
+            display: none;
+        }
+        .show {
+            display: block;
+        }
+    </style>
+    <title>ajax省份下拉联动</title>
+</head>
+<body>
+
+<p class="show" id="first">
+    <span>省份：</span>
+    <select id="province" name="province" onchange="get1();"></select>
+</p>
+
+<p class="show" id="second">
+    <span>城市：</span>
+    <select id="city" name="city" onchange="get2();"></select>
+</p>
+
+<p class="show" id="third">
+    <span>区县：</span>
+    <select id="district" name="district"></select>
+</p>
+
+<p>
+    <button onclick="clearData();">初始化</button>
+</p>
+
+<script type="application/javascript" charset="UTF-8">
+    //ajax封装
+    function createXHR(){
+        if(typeof XMLHttpRequest != "undefined"){
+            //新建XHR
+            return new XMLHttpRequest();
+            //ajax兼容模式为了支持ie7-加入原生XHR
+        } else if(typeof  ActiveXObject != "undefined"){
+            //定义底层协议
+            if(typeof arguments.callee.activeXString != "string"){
+                var versions =
+                        [
+                            "MSXML2.XMKHttp.6.0",
+                            "MSXML2.XMLHttp3.0",
+                            "MSXML2.XMLHttp"
+                        ], i,len;
+                for(i = 0 , len = versions ; i < len ; i++){
+                    try{
+                        new ActiveXObject(versions[i]);
+                        arguments.callee.activeXString = versions[i];
+                        break;
+                    } catch (ex){
+                        //跳过
+                    }
+                }
+            }
+            return new ActiveXObject(arguments.callee.activeXString);
+        }else{
+            throw new Error("XHR无法使用");
+        }
+    }
+
+    //封装ajax请求
+    //参数param值,callBack异步处理函数
+    function ajaxGet(param,callBack){
+        if(param){
+            //新建get请求
+            var xhr = createXHR();
+            //增加异步ajax功能
+            xhr.onreadystatechange = function(){
+                //ajax第5阶段
+                if(xhr.readyState == 4){
+                    if((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+                        if(typeof callBack == 'function'){
+                            //json转换
+                            function strToJson(str){
+                                var json = eval('(' + str + ')');
+                                return json;
+                            }
+                            //异步处理函数
+                            callBack(strToJson(xhr.responseText));
+                        }
+                    }
+                    else{
+                        console.error('ajax失败' + xhr.status);
+                    }
+                }
+            };
+            //异步请求数据
+            xhr.open('get','/data/' + param,true);
+            xhr.timeout = 1000 * 3;
+            xhr.send(null);
+        }
+    }
+
+    //DOM操作
+    function setTableInnerHTML(table, html) {
+        //ie或者更低版本浏览器的兼容模式
+        if(navigator && navigator.userAgent.match(/msie/i)){
+            var div = document.createElement('div');
+            if(table.id == 'province') {
+                div.innerHTML = '<select id="'+ table.id +'" onchange="get1()">' + html + '</select>';
+            }
+            else if(table.id == 'city') {
+                div.innerHTML = '<select id="'+ table.id +'" onchange="get2()">' + html + '</select>';
+            }
+            else if(table.id == 'district') {
+                div.innerHTML = '<select id="'+ table.id +'">' + html + '</select>';
+            }
+            table.parentNode.replaceChild(div.firstChild, table);
+        } else {
+            table.innerHTML=html;
+        }
+    }
+
+    //data DOM数据,level 下拉等级
+    function domService(data,level){
+        //隐藏
+        if(data.length == 0){
+            var placeLevel = [];
+            if(level == 'city'){
+                placeLevel = ['second','third'];
+            }
+            else if(level == 'district'){
+                placeLevel = ['third'];
+            }
+            for(var i = 0;i < placeLevel.length;i++){
+                var div = document.getElementById(placeLevel[i]);
+                setTimeout(function(){
+                    div.className = 'hide';
+                });
+            }
+        }
+        //显示
+        else{
+            var div = document.getElementById('second');
+            if(level == 'province'){
+                var div = document.getElementById('first');
+                div.className = 'show';
+            }
+            //假如第二级显示（第三级一定显示）
+            else if(level == 'city' && div.className == 'show') {
+                var div = document.getElementById('second');
+                div.className = 'show';
+            }
+            //假如第二级隐藏（第三级一定隐藏，此时判断第三级是否显示）
+            else if(level == 'city' && div.className == 'hide') {
+                var div = document.getElementById('second');
+                div.className = 'show';
+                //获取第三级数据
+                ajaxGet(data[0].value,function(data) {
+                    if(data.length != 0){
+                        var div = document.getElementById('third');
+                        div.className = 'show';
+                        domService(data,"district");
+                    }
+                });
+            }
+            var firstDom = '';
+            var domList = function(data,val){
+                return '<option value="'+ val +'">'+ data + '</option>'
+            };
+            for(var i = 0;i < data.length;i++){
+                firstDom += domList(data[i].name,data[i].value);
+            }
+            setTableInnerHTML(document.getElementById(level),firstDom);
+            //处理闭包作用域链
+            domList = null;
+        }
+    }
+
+    //初始化
+    function clearData(){
+        //初始化的默认一级下拉
+        ajaxGet(1,function(data){
+            domService(data,'province');
+            //初始化的默认二级下拉
+            if(data.length != 0){
+                get1();
+            }
+        });
+    }
+    clearData();
+
+    //选择下拉触发函数
+    //一级
+    function get1(){
+        //改动二级
+        ajaxGet(document.getElementById("province").value,function(data) {
+            var div = document.getElementById('second');
+            if(data.length != 0){
+                div.className = 'show';
+            }
+            else{
+                div.className = 'hide';
+                document.getElementById('third').className = 'hide';
+            }
+            domService(data,"city");
+            //改动三级
+            get2();
+        });
+    }
+
+    //二级
+    function get2(){
+        ajaxGet(document.getElementById("city").value,function(data) {
+            var div = document.getElementById('third');
+            if(data.length != 0){
+                div.className = 'show';
+            }
+            else{
+                div.className = 'hide';
+            }
+            domService(data,"district");
+        });
+    }
+
+</script>
+</body>
+</html>

@@ -233,4 +233,64 @@ class MultiplexController extends CommonController
         echo 'auth login';
     }
 
+    public function city()
+    {
+        $pc = DB::connection('pc')
+            ->table('province_city')
+            ->get(['id', 'name']);
+
+        $data = [];
+        foreach ($pc as $value) {
+            $id = $value->id;
+
+            $idStr     = substr($id, -4);
+            $firstTwo  = substr($idStr, 0, 2);
+            $secondTwo = substr($idStr, -2);
+
+            $this->handle($id, $firstTwo, $secondTwo);
+            $arr['id'] = $id;
+            $arr['name'] = $value->name;
+            $arr['level'] = $this->level;
+            $arr['upid']  = $this->parentId;
+            $data[] = $arr;
+        }
+
+        DB::connection('pc')->table('city')
+            ->insert($data);
+    }
+
+    protected function handle($id, $first, $second)
+    {
+        if ($first === '00') {
+            $this->level = 1;
+            $this->parentId = '0';
+            return;
+        }
+
+        if ($second === '00') {
+            $this->level = 2;
+            $this->parentId = substr($id, 0, 2).'0000';
+            return;
+        }
+
+        $this->level = 3;
+        $this->parentId =substr($id, 0, 4).'00';
+    }
+
+    public function allData()
+    {
+        return DB::connection('pc')->table('city')
+            ->select('name', 'id as value')
+            ->where('level', 1)
+            ->get();
+    }
+
+    public function getData($id)
+    {
+        return DB::connection('pc')->table('city')
+            ->select('name', 'id as value')
+            ->where('upid', $id)
+            ->get();
+    }
+
 }
