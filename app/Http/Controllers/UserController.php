@@ -228,7 +228,10 @@ class UserController extends CommonController
 
         $user->save();
 
-        return $this->dbRepository('mongodb', 'user')->find($uid);
+        DB::collection('user')->where('_id', $uid)
+            ->update(['updated_at' => date('Y-m-d H:i:s')]);
+
+        return DB::collection('user')->find($uid);
     }
 
     protected function updateThirdParty($rawEmail, $newEmail)
