@@ -39,11 +39,10 @@ class User extends Eloquent implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
 
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    public function fromDateTime($value)
+    {
+        // 直接调用 laravel Model fromDataTime method
+        return \Illuminate\Database\Eloquent\Model::fromDateTime($value);
+    }
 
 }
