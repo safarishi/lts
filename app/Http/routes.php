@@ -13,10 +13,13 @@
 
 Route::get('/', function()
 {
+    return 'lts 1212';
     echo 'lts';
     return view('welcome');
 });
 
+// test route
+// todo
 
 Route::patterns([
     'id'        => '[1-9][0-9]*',
@@ -30,6 +33,8 @@ Route::group(['prefix' => 'v1'], function () {
     post('regions', 'RegionController@index');
     // 更新地区信息
     put('regions', 'RegionController@update');
+    // 直辖市，区县
+    post('regions/additional', 'RegionController@indexAdditonal');
     get('regions/{flag}', 'RegionController@show');
     // 省市相关 api --end
     Route::get('articles', 'ArticleV1Controller@index');

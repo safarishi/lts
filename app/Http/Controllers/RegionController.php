@@ -10,24 +10,21 @@ class RegionController extends Controller
 
     public function index()
     {
-        $contents = file_get_contents(self::REGION_URL);
-        // 懒惰匹配，配汉字
-        $pattern = '#<td class="xl71" x:num>(.*)</td>[\s\S]*?<td class="xl71" x:str>.*?([\x{4e00}-\x{9fa5}]+).*</td>#u';
-        preg_match_all($pattern, $contents, $matches);
-        $data = array_combine($matches[1], $matches[2]);
+        $this->putInformation(self::REGION_URL);
+    }
 
+    public function indexAdditonal()
+    {
+        $tmp = DB::connection('dev_mongodb')
+            ->collection('govern_city')
+            ->get();
         $insertData = [];
-        foreach ($data as $key => $value) {
-            list($level, $parentCode) = $this->processCode($key);
-
-            $arr['code']        = $key;
-            $arr['name']        = $value;
-            $arr['level']       = $level;
-            $arr['parent_code'] = $parentCode;
-
-            $insertData[] = $arr;
+        foreach ($tmp as &$value) {
+            unset($value['_id']);
+            $insertData[] = $value;
         }
-        // insert success return true
+        unset($value);
+
         DB::connection('dev_mongodb')
             ->collection('region')
             ->insert($insertData);
@@ -61,12 +58,21 @@ class RegionController extends Controller
             return $this->baseInfomation();
         }
 
-        // todo
+        return DB::connection('dev_mongodb')
+            ->collection('region')
+            ->where('parent_code', '=', $flag)
+            ->get(['code', 'name']);
     }
 
     protected function baseInfomation()
     {
-        // todo
+        return DB::connection('dev_mongodb')
+            ->collection('region')
+            ->where('level', '=', 1)
+            ->oldest('code')
+            ->get(['code', 'name']);
+    }
+
     public function update()
     {
         // first remove all document from collection
@@ -78,6 +84,30 @@ class RegionController extends Controller
 
         $this->putInformation($latestUrl);
     }
+
+    protected function putInformation($url)
+    {
+        $contents = file_get_contents($url);
+        // 懒惰匹配，配汉字
+        $pattern = '#<td class="xl71" x:num>(.*)</td>[\s\S]*?<td class="xl71" x:str>.*?([\x{4e00}-\x{9fa5}]+).*</td>#u';
+        preg_match_all($pattern, $contents, $matches);
+        $data = array_combine($matches[1], $matches[2]);
+
+        $insertData = [];
+        foreach ($data as $key => $value) {
+            list($level, $parentCode) = $this->processCode($key);
+
+            $arr['code']        = $key;
+            $arr['name']        = $value;
+            $arr['level']       = $level;
+            $arr['parent_code'] = $parentCode;
+
+            $insertData[] = $arr;
+        }
+        // insert success return true
+        DB::connection('dev_mongodb')
+            ->collection('region')
+            ->insert($insertData);
     }
 
 }
