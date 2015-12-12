@@ -30,6 +30,7 @@ Route::patterns([
 ]);
 
 Route::group(['prefix' => 'v1'], function () {
+    get('regions', 'MultiplexController@region');
     Route::get('articles', 'ArticleV1Controller@index');
     Route::get('articles/{id}', 'ArticleV1Controller@show');
     // 收藏文章

@@ -15,6 +15,8 @@ use App\Exceptions\ValidationException;
 class MultiplexController extends CommonController
 {
 
+    const REGION_URL = 'http://files2.mca.gov.cn/www/201511/20151127101349186.htm';
+
     protected $curlUrl = '';
 
     protected $curlMethod = 'GET';
@@ -247,50 +249,102 @@ class MultiplexController extends CommonController
             $firstTwo  = substr($idStr, 0, 2);
             $secondTwo = substr($idStr, -2);
 
-            $this->handle($id, $firstTwo, $secondTwo);
+            list($level, $parentId) = $this->handle($id, $firstTwo, $secondTwo);
             $arr['id'] = $id;
             $arr['name'] = $value->name;
-            $arr['level'] = $this->level;
-            $arr['upid']  = $this->parentId;
+            $arr['level'] = $level;
+            $arr['upid']  = $parentId;
             $data[] = $arr;
         }
 
-        DB::connection('pc')->table('city')
-            ->insert($data);
+        DB::collection('city')->insert($data);
     }
 
     protected function handle($id, $first, $second)
     {
         if ($first === '00') {
-            $this->level = 1;
-            $this->parentId = '0';
-            return;
+            return [1, '0'];
         }
 
         if ($second === '00') {
-            $this->level = 2;
-            $this->parentId = substr($id, 0, 2).'0000';
-            return;
+            return [2, substr($id, 0, 2).'0000'];
         }
 
-        $this->level = 3;
-        $this->parentId =substr($id, 0, 4).'00';
+        return [3, substr($id, 0, 4).'00'];
     }
 
     public function allData()
     {
-        return DB::connection('pc')->table('city')
-            ->select('name', 'id as value')
+        $data = DB::collection('city') // city_tmp
             ->where('level', 1)
             ->get();
+
+        $returnData = [];
+        foreach ($data as $value) {
+            $arr['name'] = $value['name'];
+            $arr['value'] = $value['id'];
+            $returnData[] = $arr;
+        }
+
+        return $returnData;
     }
 
     public function getData($id)
     {
-        return DB::connection('pc')->table('city')
-            ->select('name', 'id as value')
+        $data = DB::collection('city') // city_tmp
             ->where('upid', $id)
             ->get();
+
+        $returnData = [];
+        foreach ($data as $value) {
+            $arr['name'] = $value['name'];
+            $arr['value'] = $value['id'];
+            $returnData[] = $arr;
+        }
+
+        return $returnData;
+    }
+
+    public function region()
+    {
+        return DB::collection('city')
+            ->where('level', 1)
+            ->get();
+        // $homepage = file_get_contents(self::REGION_URL);
+
+        // $pattern = '#<td class="xl71" x:num>(.*)</td>[\s\S]*?<td class="xl71" x:str>.*?([\x{4e00}-\x{9fa5}]+).*</td>#u';
+
+        // preg_match_all($pattern, $homepage, $matches);
+
+        // $provinceCity = array_combine($matches[1], $matches[2]);
+        // $insertData = [];
+        // foreach ($provinceCity as $key => $value) {
+        //     list($level, $parentId) = $this->process($key);
+        //     $data['id'] = $key;
+        //     $data['name'] = $value;
+        //     $data['level'] = $level;
+        //     $data['upid'] = $parentId;
+        //     $insertData[] = $data;
+        // }
+
+        // DB::collection('city_tmp')->insert($insertData);
+    }
+
+    protected function process($id)
+    {
+        $idStr  = substr($id, -4);
+        $first  = substr($idStr, 0, 2);
+        $second = substr($idStr, -2);
+
+        if ($first === '00') {
+            return [1, '0'];
+        }
+
+        if ($second === '00') {
+            return [2, substr($id, 0, 2).'0000'];
+        }
+
+        return [3, substr($id, 0, 4).'00'];
     }
 
 }
