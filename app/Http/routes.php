@@ -33,6 +33,8 @@ Route::patterns([
 Route::group(['prefix' => 'v1'], function () {
     // 省市相关 api --start
     post('regions', 'RegionController@index');
+    // 更新地区信息
+    put('regions', 'RegionController@update');
     get('regions/{flag}', 'RegionController@show');
     // 省市相关 api --end
     Route::get('articles', 'ArticleV1Controller@index');

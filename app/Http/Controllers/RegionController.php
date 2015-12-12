@@ -67,6 +67,17 @@ class RegionController extends Controller
     protected function baseInfomation()
     {
         // todo
+    public function update()
+    {
+        // first remove all document from collection
+        DB::connection('dev_mongodb')
+            ->collection('region')
+            ->delete();
+
+        $latestUrl = 'http://files2.mca.gov.cn/www/201511/20151127101349186.htm';
+
+        $this->putInformation($latestUrl);
+    }
     }
 
 }
