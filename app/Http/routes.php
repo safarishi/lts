@@ -24,13 +24,17 @@ get('data/1', 'MultiplexController@allData');
 get('data/{id}', 'MultiplexController@getData');
 
 Route::patterns([
-    'id' => '[1-9][0-9]*',
+    'id'        => '[1-9][0-9]*',
     'column_id' => '[1-9][0-9]*',
-    'type' => 'weibo|qq|weixin',
+    'type'      => 'weibo|qq|weixin',
+    'flag'      => 'base|[0-9][0-9]*',
 ]);
 
 Route::group(['prefix' => 'v1'], function () {
-    get('regions', 'MultiplexController@region');
+    // 省市相关 api --start
+    post('regions', 'RegionController@index');
+    get('regions/{flag}', 'RegionController@show');
+    // 省市相关 api --end
     Route::get('articles', 'ArticleV1Controller@index');
     Route::get('articles/{id}', 'ArticleV1Controller@show');
     // 收藏文章
