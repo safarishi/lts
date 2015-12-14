@@ -39,9 +39,15 @@ class User extends Eloquent implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
 
+    /**
+     * Convert a DateTime to a storable string.
+     *
+     * @param  \DateTime|int  $value
+     * @return string
+     */
     public function fromDateTime($value)
     {
-        // 直接调用 laravel Model fromDataTime method
+        // 直接调用 laravel Model fromDateTime method
         return \Illuminate\Database\Eloquent\Model::fromDateTime($value);
     }
 
